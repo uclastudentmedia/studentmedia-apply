@@ -1,0 +1,34 @@
+<div class="span6">
+ <legend>{{list_title}}</legend>
+ {%for application in applications%}
+  <label>
+   <a href="{%url 'apply' pub=application.position.publication.slug pos=application.position.slug app=application.slug%}">{{application.quarter_string}} {{application.year}}</a>&nbsp;
+   {%if application.is_open%}
+   <span class="badge badge-success">Open</span>
+   {%elif application.is_pending%}
+   <span class="badge badge-warning">Pending</span>
+   {%elif application.is_on_hold%}
+   <span class="badge badge-info">Draft</span>
+   {%else%}
+   <span class="badge badge-inverse">Closed</span>
+   {%endif%}
+   &nbsp;
+   {%if application.is_pending or application.is_on_hold%}
+   <small class="muted">Open{%if application.is_pending%}s{%else%}ed{%endif%}: {{application.open}} &sdot; </small>
+   {%endif%}
+   <small class="muted">Deadline: {{application.close}}</small>
+  </label>
+  {%if staff%}
+  <a href="{%url 'manageapp' pos=application.position.id quarter=application.quarter year=application.year%}">Edit</a>
+  &sdot;
+  {%if application.deletable%}
+  <form style="display:inline;" method="POST" action="{%url 'managedeleteapp'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+   <input type="hidden" name="id" value="{{application.id}}">
+   <a href="#" onclick="if(confirm('Are you sure you want to delete this application?'))this.parentNode.submit();return false;">Delete</a>
+  </form>
+  &sdot;
+  {%endif%}
+  <a href="{%url 'manageentries'%}?pub={{application.position.publication.slug}}&pos={{application.position.slug}}&app={{application.slug}}">View Applicant Entries</a>
+  {%endif%}
+ {%endfor%}
+</div>

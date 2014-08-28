@@ -1,0 +1,18 @@
+{%for field in form%}
+<div class="control-group{%if field.errors%} error{%endif%}">
+ <label class="control-label" for="{{field.html_name}}" placeholder="{{field.help_text}}">{{field.label}}</label>
+ <div class="controls">
+  {{field}}
+  {%if field.errors%}
+  <span class="help-inline">
+   <ul class="unstyled">
+    {%for error in field.errors%}
+    <li>{{error}}</li>
+    {%endfor%}
+   </ul>
+  </span>
+  {%endif%}
+ </div>
+</div>
+{%endfor%}
+

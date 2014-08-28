@@ -1,0 +1,143 @@
+{%extends 'base.html'%}
+
+{%block breadcrumbs%}
+{%if staff%}
+<form id="pubform" method="POST" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+ <input type="hidden" name="id" value="{{publication.id}}">
+ <input type="hidden" id="pubaction" name="action" value="toggle">
+</form>
+<form id="posform" method="POST" action="{%url 'manageposition'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+ <input type="hidden" name="publication"value="{{publication.id}}">
+ <input type="hidden" id="posid" name="id" value="">
+ <input type="hidden" id="posaction" name="action" value="">
+</form>
+<form method="POST" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+ <input type="hidden" name="id" value="{{publication.id}}">
+{%endif%}
+<ul class="breadcrumb">
+ <li><a href="{%url 'applications'%}">Media</a></li>
+ <li class="active">
+  {%if staff%}
+  <span class="btn-group">
+   <button title="{%if publication.active%}deactivate{%else%}activate{%endif%}" type="button" class="btn" onclick="editPub('toggle')"><i class="icon-eye-{%if publication.active%}close{%else%}open{%endif%}"></i></button>
+   <button title="edit publication" type="button" id="buttonedit" class="btn" onclick="showEdit(true)"><i class="icon-edit"></i></button>
+   <button title="stop editing publication (doesn't save)" type="button" id="buttonpost" style="display:none;" class="btn" onclick="showEdit(false)"><i class="icon-remove"></i></button>
+   {%if publication.deletable%}
+   <button title="delete publication" type="button" class="btn" onclick="editPub('delete')"><i class="icon-trash"></i></button>
+   {%endif%}
+   <button title="save changes" type="submit" style="display:none;" id="editsave" class="btn"><i class="icon-save"></i></button>
+  </span>
+  <input type="hidden" name="title" value="{{publication}}">
+  {%endif%}
+  <span{%if not publication.active%} class="text-error"{%endif%}>{{publication}}</span>
+ </li>
+</ul>
+{%endblock%}
+{%block content%}
+
+<p {%if staff%}id="postdesc" {%endif%}style="white-space:pre-wrap;">{%autoescape off%}{{publication.description}}{%endautoescape%}</p>
+{%if staff%}
+<textarea placeholder="This is a description of the media or program." id="editdesc" style="display:none;" class="input-block-level" rows="5" name="description">{%autoescape off%}{{publication.description}}{%endautoescape%}</textarea>
+</form>
+
+{%endif%}
+{%if poss.0%}
+<div class="row">
+ {%include 'poslist.html' with positions=poss.0%}
+ {%include 'poslist.html' with positions=poss.1%}
+</div>
+{%else%}
+{%include 'blank.html'%}
+{%endif%}
+{%if staff%}
+<form method='POST'>{%csrf_token%}
+ {%for list in poss%}
+ {%for pos in list%}
+ <input type="hidden" id="order{{pos.id}}" name="{{pos.id}}" value="{{pos.rank}}">
+ {%endfor%}
+ {%endfor%}
+ <button type="submit" class="btn">Save ordering</button>
+</form>
+<span id="posttitlenew" class="hidden"></span>
+<span id="postdescnew" class="hidden"></span>
+<div class="row">
+ <div class="span4 offset4">
+  <button title="add a new position to this publicaiton" id="buttoneditnew" class="btn btn-block" onclick="showPosEdit('new',true)"><i class="icon-plus"></i></button>
+  <button title="stop creating new position" id="buttonpostnew" class="btn btn-block" onclick="showPosEdit('new',false)" style="display:none;"><i class="icon-minus"></i></button>
+  <form method="POST" action="{%url 'manageposition'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+   <input type="hidden" name="publication" value="{{publication.id}}">
+   <input type="hidden" name="id" value="new">
+   <input id="edittitlenew" name="title" placeholder="Title" style="display:none;">
+   <button title="save new position" id="editsavenew" class="btn" type="submit" style="display:none;"><i class="icon-save"></i></button>
+   <div id="editdescnew" style="display:none;">
+    <span class="help-block">You will not be able to edit the title once this position is created.</span>
+    <textarea placeholder="This is a description of the position." class="input-block-level" rows="5" name="description"></textarea>
+   </div>
+  </form>
+ </div>
+</div>
+{%endif%}
+{%endblock%}
+{%block script%}
+{%if staff%}
+ranks = [{%for list in poss%}{%for pos in list%}'{{pos.id}}'{%if not forloop.parentloop.last or not forloop.last%},{%endif%}{%endfor%}{%endfor%}];
+function showEdit(toggle) {
+	var edit='none';
+	var post='none';
+	if(toggle)
+		edit='';
+	else
+		post='';
+	document.getElementById('editdesc').style.display=edit;
+	document.getElementById('editsave').style.display=edit;
+	document.getElementById('postdesc').style.display=post;
+	document.getElementById('buttonedit').style.display=post;
+	document.getElementById('buttonpost').style.display=edit;
+}
+function showPosEdit(id,toggle) {
+	var edit='none';
+	var post='none';
+	if(toggle)
+		edit='';
+	else
+		post='';
+	if(id == 'new') document.getElementById('edittitlenew').style.display=edit;
+	document.getElementById('editdesc'+id).style.display=edit;
+	document.getElementById('editsave'+id).style.display=edit;
+	document.getElementById('postdesc'+id).style.display=post;
+	document.getElementById('buttonedit'+id).style.display=post;
+	document.getElementById('buttonpost'+id).style.display=edit;
+}
+function editPub(action) {
+	if(confirm('Are you sure you want to '+action+' this publication?')) {
+		document.getElementById('pubaction').value=action;
+		document.getElementById('pubform').submit();
+	}
+}
+function editPos(action,id) {
+	if(confirm('Are you sure you want to '+action+' this position?')) {
+		document.getElementById('posaction').value=action;
+		document.getElementById('posid').value=id;
+		document.getElementById('posform').submit();
+	}
+}
+function updateOrder(pos) {
+	var input = document.getElementById('order'+pos.id);
+	var old = input.value;
+	if(isNaN(pos.value)) {
+		pos.value = old;
+	} else {
+		input.value = pos.value;
+		for(var key in ranks) {
+			if(ranks[key] != pos.id) {
+				var rank = document.getElementById(ranks[key]);
+				if(rank.value == input.value) {
+					rank.value = old;
+					updateOrder(rank);
+				}
+			}
+		}
+	}
+}
+{%endif%}
+{%endblock%}

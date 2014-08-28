@@ -1,0 +1,314 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<ul class="breadcrumb">
+ <li><a href="{%url 'applications'%}">Media</a></li>
+ <li><a href="{%url 'publication' position.publication.slug%}">{{position.publication}}</a></li>
+ <li><a href="{%url 'position' pub=position.publication.slug pos=position.slug%}">{{position.title}}</a></li>
+ <li class="active">{{quarter_string}} {{year}}</li>
+</ul>
+<form method="POST" onsubmit="refresh()" enctype="multipart/form-data" action="{%url 'manageapp' pos=application.position.id quarter=application.quarter year=application.year%}">{%csrf_token%}
+ <div class="row">
+  <div class="span8 offset2">
+   <div class="row">
+    <div class="span2">
+     <label>Application Period</label>
+    </div>
+    <div class="span6">
+     {{form.quarter}}
+     {{form.year}}
+    </div>
+   </div>
+   <div class="row">
+    <div class="span2">
+     <label>Publish?</label>
+    </div>
+    <div class="span6">
+     {{form.publish}}
+     <div class="text-error">
+      Check only when the application is complete and ready to be published. You will not be allowed to edit this application after it's published.
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="span2">
+     <label>Application description</label>
+    </div>
+    <div class="span6 control-group{%if form.notice.errors%} error{%endif%}">
+     {{form.notice}}
+    </div>
+   </div>
+   <div class="row">
+    <div class="span2">
+     <label>Opens</label>
+    </div>
+    <div class="span6 control-group{%if form.open.errors%} error{%endif%}">
+     {{form.open}}
+    </div>
+   </div>
+   <div class="row">
+    <div class="span2">
+     <label>Closes</label>
+    </div>
+    <div class="span6 control-group{%if form.close.errors%} error{%endif%}">
+     {{form.close}}
+    </div>
+   </div>
+   <div class="row">
+    <div class="span2">
+     <label>Editor's notes</label>
+    </div>
+    <div class="span6 control-group {%if form.staff_notes.errors%} error{%endif%}">
+     {{form.staff_notes}}
+    </div>
+   </div>
+   <div class="row">
+    <div class="span2">
+     <label>Attachments</label>
+    </div>
+    <div class="span6 control-group">
+     {{attachment_form}}
+    </div>
+   </div>
+   <div id="sections">
+   {%for section in app%}
+   <section>
+    <legend>
+     <button type="button" class="btn btn-link" onclick="deleteSection(this)"><i class="icon-remove"></i></button>
+     Section:
+     <input {%if not editable%}disabled {%endif%} value="{{section.title}}" name="{{forloop.counter0}}">
+    </legend>
+    <textarea {%if not editable%}disabled {%endif%}class="input-block-level" name="{{forloop.counter0}}.text">{{section.text}}</textarea>
+    <div>
+     {%for question in section.questions%}
+     <div class="row">
+      <div class="span3">
+       <legend>{%if editable%}<button type="button" class="btn btn-link" onclick="deleteQuestion(this)"><i class="icon-remove"></i></button> {%endif%}Question:</legend>
+       <label>Question text</label>
+       <textarea {%if not editable%}disabled {%endif%}class="input-block-level" name="{{forloop.parentloop.counter0}}.{{forloop.counter0}}">{{question.text}}</textarea>
+       <label>Question help text</label>
+       <textarea {%if not editable%}disabled {%endif%}class="input-block-level" name="{{forloop.parentloop.counter0}}.{{forloop.counter0}}.help">{{question.help}}</textarea>
+      </div>
+      <div class="span5">
+       Type:
+       <select {%if not editable%}disabled {%endif%} onchange="typeChange(this)" name="{{forloop.parentloop.counter0}}.{{forloop.counter0}}.type">
+        <option value="text"{%ifequal question.type 'text'%} selected{%endifequal%}>Text Response</option>
+        <option value="checkbox"{%ifequal question.type 'checkbox'%} selected{%endifequal%}>CheckBox (choose multiple)</option>
+        <option value="radio"{%ifequal question.type 'radio'%} selected{%endifequal%}>Radio Buttons (choose one)</option>
+        {%for type in attachmenttypes%}
+        <option value="{{type.id}}"{%ifequal type.id question.type|add:'0'%} selected{%endifequal%}>Attachment: {{type.name}}</option>
+        {%endfor%}
+       </select>
+       <ul class="unstyled">
+        {%if question.type == 'checkbox' or question.type == 'radio'%}
+        {%for choice in question.answer%}
+        <li>
+         <input {%if not editable%}disabled {%endif%}value="{{choice.text}}" name="{{forloop.parentloop.parentloop.counter0}}.{{forloop.parentloop.counter0}}.{{forloop.counter0}}">
+         {%if editable%}
+         <button type="button" class="btn btn-link" onclick="deleteChoice(this)"><i class="icon-remove"></i></button>
+         {%endif%}
+        </li>
+        {%endfor%}
+        {%endif%}
+       </ul>
+       {%if editable%}
+       <button {%if question.type != 'checkbox' and question.type != 'radio'%}style="display:none;" {%endif%}type="button" class="btn btn-link" onclick="addChoice(this)"><i class="icon-plus"></i> Add New Choice</button>
+       {%endif%}
+      </div>
+     </div>
+     {%endfor%}
+    </div>
+    {%if editable%}
+    <button type="button" class="btn btn-link" onclick="addQuestion(this)"><i class="icon-plus"></i> Add New Question</button>
+    {%endif%}
+   </section>
+   {%endfor%}
+   </div>
+   {%if editable%}
+   <div class="row">
+    <div class="span6 offset2">
+     <button type="button" class="btn btn-link" onclick="addSection(this)"><i class="icon-plus"></i> Add New Section</button>
+    </div>
+   </div>
+   {%endif%}
+   <div class="row">
+    <button type="submit" class="btn btn-primary btn-block">Save</button>
+   </div>
+  </div>
+ </div>
+</form>
+{%endblock%}
+{%block script%}
+function addSection(button) {
+	var sections = button.parentNode.parentNode.previousSibling;
+	id = sections.childNodes.length;
+	var new_section = document.createElement('SECTION');
+		var legend = document.createElement('LEGEND');
+			var remove_button = document.createElement('BUTTON');
+				remove_button.type = 'button';
+				remove_button.className = 'btn btn-link';
+				remove_button.onclick = function() { deleteSection(remove_button); };
+				var remove = document.createElement('I');
+					remove.className = 'icon-remove';
+				remove_button.appendChild(remove);
+			legend.appendChild(remove_button);
+			legend.appendChild(document.createTextNode('Section:'));
+			var section_title = document.createElement('INPUT');
+			legend.appendChild(section_title);
+		new_section.appendChild(legend);
+		var text = document.createElement('TEXTAREA');
+			text.className = 'input-block-level';
+		new_section.appendChild(text);
+		var questions = document.createElement('DIV');
+		new_section.appendChild(questions);
+		var button = document.createElement('BUTTON');
+			button.type='button';
+			button.className='btn btn-link';
+			button.onclick = function() { addQuestion(button); };
+			var plus = document.createElement('I');
+				plus.className='icon-plus';
+			button.appendChild(plus);
+			button.appendChild(document.createTextNode(' Add New Question'));
+		new_section.appendChild(button);
+	sections.appendChild(new_section);
+}
+
+function deleteSection(button) {
+	button.parentNode.parentNode.parentNode.removeChild(button.parentNode.parentNode);
+}
+
+function addQuestion(button) {
+	var questions = button.previousSibling;
+	var new_question = document.createElement('DIV');
+		new_question.className = 'row';
+		var three = document.createElement('DIV');
+			three.className='span3';
+			var legend = document.createElement('LEGEND');
+				var remove_button = document.createElement('BUTTON');
+					remove_button.type = 'button';
+					remove_button.className = 'btn btn-link';
+					remove_button.onclick = function() { deleteQuestion(remove_button); };
+					var remove = document.createElement('I');
+						remove.className = 'icon-remove';
+					remove_button.appendChild(remove);
+				legend.appendChild(remove_button);
+				legend.appendChild(document.createTextNode('Question:'));
+			three.appendChild(legend);
+			var text_label = document.createElement('LABEL');
+				text_label.appendChild(document.createTextNode('Question text'));
+			three.appendChild(text_label);
+			var question_text = document.createElement('TEXTAREA');
+				question_text.className='input-block-level';
+			three.appendChild(question_text);
+			var help_label = document.createElement('LABEL');
+				help_label.appendChild(document.createTextNode('Question help text'));
+			three.appendChild(help_label);
+			var question_help = document.createElement('TEXTAREA');
+				question_help.className='input-block-level';
+			three.appendChild(question_help);
+		new_question.appendChild(three);
+		var five = document.createElement('DIV');
+			five.className='span5';
+			five.appendChild(document.createTextNode('Type: '));
+			var type = document.createElement('SELECT');
+				type.onchange = function() { typeChange(type); };
+				var text = document.createElement('OPTION');
+					text.value = 'text';
+					text.appendChild(document.createTextNode('Text Response'));
+				type.appendChild(text);
+				var check = document.createElement('OPTION');
+					check.value = 'checkbox';
+					check.appendChild(document.createTextNode('CheckBox (choose multiple)'));
+				type.appendChild(check);
+				var radio = document.createElement('OPTION');
+					radio.value = 'radio';
+					radio.appendChild(document.createTextNode('Radio Buttons (choose one)'));
+				type.appendChild(radio);
+				{%for type in attachmenttypes%}
+				var att{{type.id}} = document.createElement('OPTION');
+					att{{type.id}}.value = '{{type.id}}';
+					att{{type.id}}.appendChild(document.createTextNode('Attachment: {{type.name}}'));
+				type.appendChild(att{{type.id}});
+				{%endfor%}
+			five.appendChild(type);
+			var ul = document.createElement('UL');
+				ul.className='unstyled';
+			five.appendChild(ul);
+			var add_button = document.createElement('BUTTON');
+				add_button.type = 'button';
+				add_button.className = 'btn btn-link';
+				add_button.style.display='none';
+				add_button.onclick= function() { addChoice(add_button); };
+				var plus = document.createElement('I');
+					plus.className = 'icon-plus';
+				add_button.appendChild(plus);
+				add_button.appendChild(document.createTextNode(' Add New Choice'));
+			five.appendChild(add_button);
+		new_question.appendChild(five);
+	questions.appendChild(new_question);
+}
+
+function deleteQuestion(question) {
+	question.parentNode.parentNode.parentNode.parentNode.removeChild(question.parentNode.parentNode.parentNode);
+}
+
+function addChoice(button) {
+	var choices = button.previousSibling;
+	var c_id = choices.childNodes.length
+		var new_choice = document.createElement('LI');
+			var input = document.createElement('INPUT');
+			new_choice.appendChild(input);
+			var button = document.createElement('BUTTON');
+				button.type='button';
+				button.className='btn btn-link';
+				button.onclick = function() { deleteChoice(button); };
+				var remove = document.createElement('I');
+					remove.className = 'icon-remove';
+				button.appendChild(remove);
+			new_choice.appendChild(button);
+		choices.appendChild(new_choice);
+}
+
+function deleteChoice(choice) {
+	choice.parentNode.parentNode.removeChild(choice.parentNode);
+}
+
+function typeChange(select) {
+	var ul = select.nextSibling;
+	var add_choice_button = ul.nextSibling;
+	if(select.options[select.selectedIndex].value == 'checkbox' || select.options[select.selectedIndex].value == 'radio') {
+		add_choice_button.style.display='';
+	} else {
+		add_choice_button.style.display='none';
+		while(ul.childNodes.length > 0)
+			ul.removeChild(ul.firstChild);
+	}
+}
+
+function refresh() {
+	var sections = document.getElementById('sections');
+	for(var s = 0; s < sections.childNodes.length; s++) {
+		var section = sections.childNodes[s];
+		var sname = section.firstChild.lastChild;
+		sname.name = s;
+		var stext = section.childNodes[1];
+		stext.name = s+'.text';
+		var questions = section.childNodes[2];
+		for(var q = 0; q < questions.childNodes.length; q++) {
+			var question = questions.childNodes[q];
+			var choices = question.childNodes[1].childNodes[2];
+			var qtext = question.firstChild.childNodes[2];
+			var qhelp = question.firstChild.childNodes[4];
+			var qtype = question.childNodes[1].childNodes[1];
+			qtext.name = s+'.'+q;
+			qhelp.name = s+'.'+q+'.help';
+			qtype.name = s+'.'+q+'.type';
+			for(var c = 0; c < choices.childNodes.length; c++) {
+				var choice = choices.childNodes[c];
+				var input = choice.firstChild;
+				input.name = s+'.'+q+'.'+c;
+			}
+		}
+	}
+}
+{%endblock%}

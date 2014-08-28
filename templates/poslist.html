@@ -1,0 +1,33 @@
+<div class="span6">
+  {%for position in positions%}
+  {%if request.user.is_authenticated and request.user.is_staff%}
+  <form method="POST" action="{%url 'manageposition'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+   <input type="hidden" name="id" value="{{position.id}}">
+   <input type="hidden" name="publication" value="{{position.publication.id}}">
+   <input type="hidden" value="{{position.title}}" name="title">
+  {%endif%}
+   <legend>
+    {%if staff%}
+    <input class="input-mini" id="{{position.id}}" value="{{position.rank}}" onchange="updateOrder(this)">
+    {%endif%} 
+    <a href="{%url 'position' pub=publication.slug pos=position.slug%}">{{position.title}}</a>
+   </legend>
+   <span class="badge{%if position.active%} badge-{%if position.open%}success{%else%}important{%endif%}{%endif%}">
+    {%if position.active%}{%if position.open%}Open{%else%}Closed{%endif%}{%else%}Draft{%endif%}
+   </span>
+   <p id="postdesc{{position.id}}" style="white-space:pre-wrap;">{%autoescape off%}{{position.short_description}}{%endautoescape%}</p>
+  {%if request.user.is_authenticated and request.user.is_staff%}
+   <textarea placeholder="This is a description of the position." rows="8" class="input-block-level" style="display:none;" id="editdesc{{position.id}}" name="description">{%autoescape off%}{{position.description}}{%endautoescape%}</textarea>
+   <button style="display:none;" type="submit" id="editsave{{position.id}}" class="btn btn-block"><i class="icon-save"></i></button>
+   <div class="btn-group">
+    <button title="{%if position.active%}deactivate{%else%}activate{%endif%}" onclick="editPos('toggle',{{position.id}})" class="btn"><i class="icon-eye-{%if position.active%}close{%else%}open{%endif%}"></i></button>
+    <button type="button" id="buttonedit{{position.id}}" title="edit position title or description" onclick="showPosEdit({{position.id}},true)" class="btn"><i class="icon-edit"></i></button>
+    <button type="button" id="buttonpost{{position.id}}" title="stop editing position (doesn't save)" onclick="showPosEdit({{position.id}},false)" class="btn" style="display:none;"><i class="icon-remove"></i></button>
+    {%if position.deletable%}
+    <button title="delete this position" onclick="editPos('delete',{{position.id}})" class="btn"><i class="icon-trash"></i></button>
+    {%endif%}
+   </div>
+  </form>
+  {%endif%}
+  {%endfor%}
+ </div>

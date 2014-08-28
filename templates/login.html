@@ -1,0 +1,23 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<div class="row">
+ <div class="span4 offset4">
+  <legend>Login</legend>
+  <form class="form-horizontal" method="post">{%csrf_token%}
+   {%include 'table.html' with form=loginform%}
+   <div class="control-group">
+    <div class="controls">
+     <button type="submit" class="btn">Log In</button>
+     &nbsp;<a href="{%url 'reset'%}">Forgot your password?</a>
+    </div>
+   </div>
+   <div class="control-group">
+    <div class="controls">
+     <a href="{%url 'register'%}?next={{request.GET.next}}">Register</a> to begin applying!<br/>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>
+{%endblock%}

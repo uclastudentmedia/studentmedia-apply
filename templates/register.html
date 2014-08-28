@@ -1,0 +1,34 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<div class="row">
+ <div class="span4 offset4">
+  <legend>Register</legend>
+  <form class="form-horizontal" method="POST">{%csrf_token%}
+   <div class="control-group">
+    <label class="control-label" for="username" placeholder="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.">New Username</label>
+    <div class="controls">
+     <input maxlength="30" name="username" type="text">
+    </div>
+   </div>
+   <div class="control-group">
+    <label class="control-label" for="password1" placeholder>New Password</label>
+    <div class="controls">
+     <input id="id_password1" name="password1" type="password">
+    </div>
+   </div>
+   <div class="control-group">
+    <label class="control-label" for="passwordd2" placeholder="Enter the same password as above, for verification.">Confirm New Password</label>
+    <div class="controls">
+     <input id="id_password2" name="password2" type="password">
+    </div>
+   </div>
+   <div class="control-group">
+    <div class="controls">
+     <button type="submit" class="btn btn-primary">Register</button>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>
+{%endblock%}

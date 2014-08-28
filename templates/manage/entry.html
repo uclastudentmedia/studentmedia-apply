@@ -1,0 +1,197 @@
+{%extends 'base.html'%}
+
+{%block breadcrumbs%}
+<ul class="breadcrumb">
+ <li><a href="{%url 'applications'%}">Media</a></li>
+ <li><a href="{%url 'publication' entry.application.position.publication.slug%}">{{entry.application.position.publication}}</a></li>
+ <li><a href="{%url 'position' pub=entry.application.position.publication.slug pos=entry.application.position.slug%}">{{entry.application.position.title}}</a></li>
+ <li><a href="{%url 'manageentries'%}?pub={{entry.application.position.publication.slug}}&pos={{entry.application.position.slug}}&app={{entry.application.slug}}">{{entry.application.quarter_string}} {{entry.application.year}}</a></li>
+ <li class="active">{%firstof entry.applicant.profile entry.applicant 'Unknown User'%}</li>
+</ul>
+{%endblock%}
+{%block content%}
+<div class="row-fluid">
+ <div class="span4">
+  <legend>Profile</legend>
+  {%if profile%}
+  <table class="table">
+   <tr>
+    <th>Name</th>
+    <td>
+     <a href="{%url 'manageperson' profile.id%}">{{profile}}</a>
+    </td>
+   </tr>
+   {%if profile.picture%}
+   <tr>
+    <th>Photo</th>
+    <td>
+     <a href="{{profile.picture.url}}" target="_blank">{{profile.filename}}</a>
+    </td>
+   </tr>
+   {%endif%}
+   <tr>
+    <th>Date of Birth</th>
+    <td>{{profile.birth}}</td>
+   </tr>
+   <tr>
+    <th>Gender</th>
+    <td>{{profile.gender_string}}</td>
+   </tr>
+   <tr>
+    <th>Email</th>
+    <td><a href="mailto:{{profile.email}}">{{profile.email}}</a></td>
+   </tr>
+   <tr>
+    <th>Student ID</th>
+    <td>{{profile.sid}}</td>
+   </tr>
+   <tr>
+    <th>Major</th>
+    <td>{{profile.major}}</td>
+   </tr>
+   <tr>
+    <th>Graduation Date</th>
+    <td>{{profile.quarter_string}} {{profile.year}}</td>
+   </tr>
+   <tr>
+    <th>High School</th>
+    <td>{{profile.high}}{%if profile.city_high%}<br/>{{profile.city_high}}{%endif%}
+   </tr>
+  </table>
+  <div class="row-fluid">
+   <div class="span6">
+    <address>
+     <strong>Local Address</strong><br/>
+     {{profile.add1_local}}<br/>
+     {%if profile.add2_local%}
+     {{profile.add2_local}}<br/>
+     {%endif%}
+     {{profile.city_local}}, {{profile.state_local}} {{profile.postal_local}}<br/>
+     <abbr title="Mobile Phone">P:</abbr> {{profile.phone_mob}}
+    </address>
+   </div>
+   <div class="span6">
+    <address>
+     <strong>Permanent Address</strong><br/>
+     {{profile.add1_perm}}<br/>
+     {%if profile.add2_perm%}
+     {{profile.add2_perm}}<br/>
+     {%endif%}
+     {{profile.city_perm}}, {{profile.state_perm}} {{profile.postal_perm}}<br/>
+     <abbr title="Permanent Phone">P:</abbr> {{profile.phone_perm}}
+    </address>
+   </div>
+  </div>
+  {%else%}
+  <div class="alert alert-block">
+   <button type="button" class="close" data-dismiss="alert">&times;</button>
+   There's nothing here!
+  </div>
+  {%endif%}
+  <legend>Other Applications</legend>
+  <ul>
+   {%for e in entry.applicant.entry_set.all%}
+   {%if e != entry%}
+   <li><a href="{%url 'manageentry' e.id%}">{{e.application.position}} {{e.application}}</a></li>
+   {%endif%}
+   {%endfor%}
+  </ul>
+ </div>
+ <div class="span8">
+  <legend>
+   Application
+   <small class="{%if entry.status == INCOMPLETE%}muted{%elif entry.status == SUBMITTED%}text-info{%elif entry.status == ACCEPTED%}text-success{%elif entry.status == REJECTED%}text-error{%elif entry.status == WAITLISTED%}text-warning{%endif%}">
+    {{entry.status_string}}
+   </small>
+  </legend>
+  <p style="white-space:pre-wrap;">{{notice}}</p>
+  <table class="table">
+  {%for section in application%}
+   <tr>
+    <th colspan="2">{{section.title}}</th>
+   </tr>
+   {%for question in section.questions%}
+   <tr>
+    <td>
+     <label>{{question.text}}</label>
+    </td>
+    <td>
+     {%if question.type == 'radio' or question.type == 'checkbox'%}
+     <ul class="unstyled">
+      {%for choice in question.answer%}
+      {%if choice.chosen%}
+      <li>{{choice.text}}</li>
+      {%endif%}
+      {%endfor%}
+     </ul>
+     {%elif question.type == 'text'%}
+     <p style="white-space:pre-wrap;">{{question.answer}}</p>
+     {%else%}
+     {%for answer in question.answer%}
+     {%if answer.chosen%}
+     <a href="{{answer.url}}" target="_blank">{{answer.filename}}</a>
+     {%endif%}
+     {%endfor%}
+     {%endif%}
+    </td>
+   </tr>
+   {%endfor%}
+  {%endfor%}
+  </table>
+  {%if entry.status == SUBMITTED or entry.status == WAITLISTED%}
+  <form id="changeform" class="form-search" method="POST">{%csrf_token%}
+   <div class="input-append">
+    <select id="changestatus" name="status" class="search-query" onchange="changeColor(this.value)">
+     {%for status in STATUSES%}
+     {%if status.0 != INCOMPLETE and status.0 != SUBMITTED and status.0 != DECLINED and entry.status != status.0%}
+     <option value="{{status.0}}"{%ifequal status.0 entry.status%} selected{%endifequal%}>{{status.1|cut:'ed'}}</option>
+     {%endif%}
+     {%endfor%}
+    </select>
+    <button id="changebutton" onclick="submitChange()" type="button"  class="btn"><i class="icon-arrow-right"></i></button>
+   </div>
+  </form>
+  {%endif%}
+  <form method="POST" class="form-horizontal">{%csrf_token%}
+   <div class="control-group">
+    <label class="control-label">Editor's notes:</label>
+    <div class="controls">
+     <textarea rows="7" name="notes" class="input-block-level">{{entry.notes}}</textarea>
+    </div>
+   </div>
+   <div class="control-group">
+    <div class="controls">
+     <button type="submit" class="btn">Save notes</button>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>
+{%endblock%}
+{%block script%}
+{%if entry.status == SUBMITTED or entry.status == WAITLISTED%}
+function submitChange() {
+	if(confirm('Are you sure? Changing the application status is permanent (unless being waitlisted, in which case it can subsequently be accepted or rejected).')) {
+		document.getElementById('changeform').submit();
+	}
+}
+function changeColor(status) {
+	var button = document.getElementById('changebutton');
+	switch(status) {
+		case '{{ACCEPTED}}':
+			button.className = "btn btn-success";
+			break;
+		case '{{REJECTED}}':
+			button.className = "btn btn-danger";
+			break;
+		case '{{WAITLISTED}}':
+			button.className = "btn btn-warning";
+			break;
+		case '{{SUBMITTED}}':
+			button.className = "btn btn-info";
+			break;
+	}
+}
+$(document).ready(function() {changeColor(document.getElementById('changestatus').value);});
+{%endif%}
+{%endblock%}

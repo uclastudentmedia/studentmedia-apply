@@ -1,0 +1,359 @@
+{%extends 'base.html'%}
+
+{%comment%}{%block breadcrumbs%}
+<ul class="breadcrumb">
+ <li><a href="{%url 'applications'%}">Media</a></li>
+ <li><a href="{%url 'publication' application.position.publication.slug%}">{{application.position.publication}}</a></li>
+ <li><a href="{%url 'position' pub=application.position.publication.slug pos=application.position.slug%}">{{application.position.title}}</a></li>
+ <li class="active">{{application.quarter_string}} {{application.year}}</li>
+</ul>
+{%endblock%}{%endcomment%}
+{%block content%}
+<div class="row-fluid">
+ <div class="span5">
+  <form id="form">
+   <input id="p" name="p" type="hidden" value="{{p}}">
+   <input id="pp" name="pp" type="hidden" value="{{pp}}">
+   <fieldset>
+    <legend>Search</legend>
+    <div class="row-fluid">
+     {{search_form.ufilter}}
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      <label>Media</label>
+      {{search_form.pub}}
+     </div>
+     <div class="span6">
+      <label>Position</label>
+      {{search_form.pos}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      <label>Entry Quarter</label>
+      {{search_form.e_quarter}}
+     </div>
+     <div class="span6">
+      <label>Entry Year</label>
+      {{search_form.e_year}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      <label>Application Status</label>
+      {{search_form.entry_status}}
+     </div>
+     <div class="span6">
+      <label>Profile Status</label>
+      {{search_form.position}}
+      {{search_form.status}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      {{search_form.name}}
+     </div>
+     <div class="span6">
+      {{search_form.email}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      {{search_form.num_mob}}
+     </div>
+     <div class="span6">
+      {{search_form.num_prm}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      {{search_form.addr_loc}}
+     </div>
+     <div class="span6">
+      {{search_form.addr_prm}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      {{search_form.major}}
+     </div>
+     <div class="span6">
+      {{search_form.high}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      <label>Gender</label>
+      {{search_form.gender}}
+     </div>
+     <div class="span6">
+      <label>Graduating Quarter</label>
+      {{search_form.quarter}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span6">
+      {{search_form.year_low}}
+     </div>
+     <div class="span6">
+      {{search_form.year_high}}
+     </div>
+    </div>
+    <div class="row-fluid">
+     <div class="span8 offset2">
+      <button type="submit" class="btn btn-primary btn-block"><i class="icon-search"></i></button>
+     </div>
+    </div>
+   </fieldset>
+  </form>
+ </div>
+ <div class="span7">
+  <legend>Dispatch Emails</legend>
+  <form class="form-horizontal" method="POST" id="email-form">{%csrf_token%}
+   <div class="control-group">
+    <label class="control-label">Sender</label>
+    <div class="controls">
+     <input name="sender" type="text" class="input-block-level">
+    </div>
+   </div>
+   <div class="control-group">
+    <label class="control-label">Recipients</label>
+    <div class="controls">
+     <textarea name="recipients" type="text" class="input-block-level">{{emails}}</textarea>
+     <span class="help-block">
+      Use search filter to narrow down recipients. Then use this form to send out emails or copy then paste this area into an email service of your choice.
+     </span>
+    </div>
+   </div>
+   <div class="control-group">
+    <label class="control-label">Subject</label>
+    <div class="controls">
+     <input name="subject" type="text" class="input-block-level">
+    </div>
+   </div>
+   <div class="control-group">
+    <label class="control-label">Message</label>
+    <div class="controls">
+     <textarea name="message" type="text" class="input-block-level" rows="8"></textarea>
+     <span class="help-block">
+      %N - Recipient's full name &sdot;
+      %n - Recipient's first name
+     </span>
+    </div>
+   </div>
+   <div class="control-group">
+    <div class="controls">
+     <button type="submit" class="btn btn-primary btn-block"><i class="icon-envelope"></i></button>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>
+<div class="row-fluid">
+ <div class="span12">
+  <legend>Entries <span class="muted">{{entry_count}} ({{unique_count}} unique applicants)</span></legend>
+  {%if entries%}
+  <table class="table table-condensed table-hover" id="entry-list">
+   <tr>
+    <th>Status</th>
+    <th>Applicant</th>
+    <th>Application</th>
+    <th>Email</th>
+    <th>Submitted</th>
+   </tr>
+   {%for entry in entries%}
+   <tr>
+    <td>{{entry.status_string}}</td>
+    <td>
+     <a href="{%url 'manageentry' entry.id%}">
+      {%if entry.applicant.profile%}
+      {{entry.applicant.profile}}
+      {%else%}
+      {{entry.applicant}} <small class="muted">No Profile</small>
+      {%endif%}
+     </a>
+    </td>
+    <td>{{entry}}</td>
+    <td>
+     {%if entry.applicant.profile.email%}
+     <a href="mailto:{{entry.applicant.profile.email}}">
+      {{entry.applicant.profile.email}}
+     </a>
+     {%else%}
+     <span class="muted">N/A</span>
+     {%endif%}
+    </td>
+    <td>
+     {%if entry.submit%}
+     {{entry.submit}}
+     {%else%}
+     <span class="muted">N/A</span>
+     {%endif%}
+    </td>
+   </tr>
+   {%endfor%}
+  </table>
+  <div class="pagination pagination-centered">
+   <ul>
+    <li class="{%if p > 1%}active"><a onclick="changePage({{p|add:-1}})"{%else%}disabled"><a{%endif%}><i class="icon-chevron-left"></i></a></li>
+    {%for page in page_range%}
+    <li class="{%if page != p%}active"><a onclick="changePage({{page}})"{%else%}disabled"><a{%endif%}>{{page}}</a></li>
+    {%endfor%}
+    <li class="{%if p < page_count%}active"><a onclick="changePage({{p|add:1}})"{%else%}disabled"><a{%endif%}><i class="icon-chevron-right"></i></a></li>
+   </ul>
+  </div>
+  <div class="btn-toolbar text-center">
+   <div class="btn-group">
+    {%for op in pp_op%}
+    <button class="btn" onclick="setPP({{op}})">{{op}}</button>
+    {%endfor%}
+   </div>
+   <div class="btn-group">
+    <button class="btn" onclick="setPP('all')">All</button>
+   </div>
+  </div>
+  {%else%}
+  {%include 'blank.html' with blank_type='entries'%}
+  {%endif%}
+ </div>
+</div>
+{%endblock%}
+{%block script%}
+var poss = {%autoescape off%}{{poss}}{%endautoescape%};
+var poss_keys = [];
+for(key in poss) {
+	poss_keys.push(key);
+}
+poss_keys.sort();
+var apps= {%autoescape off%}{{apps}}{%endautoescape%};
+var apps_keys = [];
+for(key in apps) {
+	apps_keys.push(key);
+}
+apps_keys.sort();
+function changePage(p) {
+	document.getElementById('p').value=p;
+	document.getElementById('form').submit();
+}
+function setPP(pp) {
+	document.getElementById('p').value=1;
+	document.getElementById('pp').value=pp;
+	document.getElementById('form').submit();
+}
+function updatePub(pub) {
+	var pub_values = $('select#pub').val();
+	var old = $('select#pos').val();
+	var pos = document.getElementById('pos');
+	while(pos.childNodes.length > 0)
+		pos.removeChild(pos.lastChild);
+	if(pub_values == null) {
+		for(var i = 0; i < poss_keys.length; i++) {
+			var option = document.createElement('OPTION');
+			option.value = poss_keys[i];
+			option.innerHTML = poss[poss_keys[i]]['text'];
+			if(old != null && old.indexOf(poss_keys[i]) != -1) option.selected='selected';
+			pos.appendChild(option);
+		}
+	} else {
+		for(var i = 0; i < poss_keys.length; i++) {
+			for(var j = 0; j < pub_values.length; j++) {
+				if(poss[poss_keys[i]]['pubs'].indexOf(pub_values[j]) != -1) {
+					var option = document.createElement('OPTION');
+					option.value = poss_keys[i];
+					option.innerHTML = poss[poss_keys[i]]['text'];
+					if(old != null && old.indexOf(poss_keys[i]) != -1) option.selected='selected';
+					pos.appendChild(option);
+					break;
+				}
+			}
+		}
+	}
+	//updatePos(pos);
+}
+function updatePos(pos) {
+	var pos_values = $('select#pos').val();
+	var old = $('select#app').val();
+	var app = document.getElementById('app');
+	while(app.childNodes.length > 0)
+		app.removeChild(app.lastChild);
+	if(pos_values == null) {
+		pos_values = [];
+		$('select#pos option').each(function() {
+			pos_values.push($(this).val());
+		});
+	}
+	for(var i = 0; i < apps_keys.length; i++) {
+		for(var j = 0; j < pos_values.length; j++) {
+			if(apps[apps_keys[i]]['poss'].indexOf(pos_values[j]) != -1) {
+				var option = document.createElement('OPTION');
+				option.value = apps_keys[i];
+				option.innerHTML = apps[apps_keys[i]]['text'];
+				if(old != null && old.indexOf(apps_keys[i]) != -1) option.selected='selected';
+				app.appendChild(option);
+				break;
+			}
+		}
+	}
+}
+var quarters = {%autoescape off%}{{QUARTERS}};
+var statuses = {{STATUSES}};{%endautoescape%}
+function quarter(quarter) {
+	return quarters[quarter];
+}
+function status(entry) {
+	return statuses[entry['status']];
+}
+function name(entry) {
+	var name = '';
+	if(entry['applicant__profile__first'])
+		name+=entry['applicant__profile__first'];
+	if(entry['applicant__profile__middle'])
+		name+=' '+entry['applicant__profile__middle'];
+	if(entry['applicant__profile__last'])
+		name+=' '+entry['applicant__profile__last'];
+	if(entry['applicant__profile__first'] || entry['applicant__profile__middle'] || entry['applicant__profile__last'])
+		return name;
+	return entry['applicant__username'];
+}
+function application(entry) {
+	return entry['application__position__publication__title']+': '+entry['application__position__title']+' - '+quarter(entry['application__quarter'])+' '+entry['application__year'];
+}
+function email(entry) {
+	if(entry['applicant__profile__email'])
+		return entry['applicant__profile__email'];
+	return 'N/A';
+}
+function submit(entry) {
+	if(entry['submit'])
+		return entry['submit'];
+	return 'N/A';
+}
+function row(entry) {
+	var row = '<tr>';
+	row+= '<td>'+status(entry)+'</td>';
+	row+= '<td><a href="/manage/entries/'+entry['id']+'/">'+name(entry)+'</a></td>';
+	row+= '<td>'+application(entry)+'</td>';
+	row+= '<td>'+email(entry)+'</td>';
+	row+= '<td>'+submit(entry)+'</td>';
+	row+= '</tr>';
+	return row;
+}
+{%comment%}
+$(document).ready(function() {
+	updatePub(document.getElementById('pub'));
+	$.ajax({
+		type:'GET',
+		url:'{%url 'entriesjson'%}',
+		dataType:'json',
+		success:function(data) {
+			var list = Array();
+			for(var key in data) list.push(data[key]);
+			for(var i = 0; i < list.length; i++) {
+				$('#entry-list').append(row(list[i]));
+			}
+		},
+	});
+});
+{%endcomment%}
+{%endblock%}

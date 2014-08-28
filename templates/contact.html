@@ -1,0 +1,71 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<h1 class="section-header">Contact</h1>
+<div class="row">
+ <div class="span4">
+  <div class="blog-side-text-block widget-filled widget-yellow">
+   <legend>Contact Information</legend>
+   <ul class="unstyled big-iconed-tips">
+    {%for piece in contacts%}
+    <li>
+     <i class="{{piece.icon}}"></i>
+     {{piece.title}}: {{piece.info}}
+    </li>
+    {%endfor%}
+   </ul>
+  </div>
+ </div>
+ <div class="span8">
+  <form class="" method="POST">{%csrf_token%}
+   <div class="row-fluid">
+    <div class="span6">
+     <div class="control-group{%if contact_form.sender.errors%} error{%endif%}">
+      <label class="control-label">Sender</label>
+      <div class="controls">
+       {{contact_form.sender}}
+      </div>
+     </div>
+    </div>
+    <div class="span6">
+     <div class="control-group{%if contact_form.recipient.errors%} error{%endif%}">
+      <label class="control-label">Recipient</label>
+      <div class="controls">
+       {{contact_form.recipient}}
+       <span class="help-block" id="info"></span>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="control-group{%if contact_form.subject.errors%} error{%endif%}">
+    <label class="control-label">Subject</label>
+    <div class="controls">
+     {{contact_form.subject}}
+    </div>
+   </div>
+   <div class="control-group{%if contact_form.message.errors%} error{%endif%}">
+    <label class="control-label">Message</label>
+    <div class="controls">
+     {{contact_form.message}}
+    </div>
+   </div>
+   <div class="control-group">
+    <div class="controls">
+     <button type="submit" class="btn btn-primary btn-block"><i class="icon-envelope"></i></button>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>
+{%endblock%}
+{%block script%}
+var infolist = {%autoescape off%}{{infolist}}{%endautoescape%};
+function updateRecipient(select) {
+	if(select.value) {
+		document.getElementById('info').innerHTML=infolist[select.value];
+	} else {
+		document.getElementById('info').innerHTML='{{default}}';
+	}
+}
+$(document).ready(function () { updateRecipient(document.getElementById('id_recipient')); });
+{%endblock%}

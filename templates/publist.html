@@ -1,0 +1,58 @@
+ <div class="span4">
+  {%for publication in publications%}
+  <legend>
+   {%if staff%}
+   <input class="input-mini" id="{{publication.id}}" value="{{publication.rank}}" onchange="updateOrder(this)">
+   {%endif%}
+   <a href="{%url 'publication' publication.slug%}">{{publication}}</a>{%if not publication.active%} <small class="text-error"> Draft</small>{%endif%}
+  </legend>
+  <p id="post{{publication.id}}" style="white-space:pre-wrap;">{%autoescape off%}{{publication.short_description}}{%endautoescape%}</p>
+  {%if request.user.is_authenticated and request.user.is_staff%}
+  <div id="edit{{publication.id}}" style="display:none;">
+   <form method="post" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+    <input type="hidden" name="id" value="{{publication.id}}">
+    <input type="hidden" name="title" value="{{publication.title}}">
+    <input type="checkbox" class="hidden" name="active"{%if publication.active%} checked{%endif%}>
+    <textarea placeholder="This is a description of the media or program." rows="8" class="input-block-level" name="description">{%autoescape off%}{{publication.description}}{%endautoescape%}</textarea>
+    <button type="submit" class="btn btn-block"><i class="icon-save"></i></button></legend>
+   </form>
+  </div>
+  <div class="btn-group">
+   <button title="{%if publication.active%}deactivate{%else%}activate{%endif%}" onclick="editPub('toggle',{{publication.id}})" class="btn"><i class="icon-eye-{%if publication.active%}close{%else%}open{%endif%}"></i></button>
+   <button id="buttonedit{{publication.id}}" title="edit publication title or description" onclick="showEdit({{publication.id}},true)" class="btn"><i class="icon-edit"></i></button>
+   <button id="buttonpost{{publication.id}}" title="stop editing publication (doesn't save)" onclick="showEdit({{publication.id}},false)" class="btn" style="display:none;"><i class="icon-remove"></i></button>
+   {%if publication.deletable%}
+   <button title="delete this publication" onclick="editPub('delete',{{publication.id}})" class="btn"><i class="icon-trash"></i></button>
+   {%endif%}
+  </div>
+  {%endif%}
+  <ul class="unstyled">
+   {%if publication.no_app and not staff%}
+   {%include 'blank.html'%}
+   {%else%}
+   {%for position in publication.position_set.all%}
+   {%if position.active or staff%}
+   <li>
+    <label>
+     <a href="{%url 'position' pub=publication.slug pos=position.slug%}">{{position.title}}</a>&nbsp;
+     <span class="badge{%if position.active%} badge-{%if position.open%}success{%else%}important{%endif%}{%endif%}">
+      {%if position.active%}
+      {%if position.open%}
+      Open
+      {%else%}
+      Closed
+      {%endif%}
+      {%else%}
+      Draft
+      {%endif%}
+     </span>
+    </label>
+   </li>
+   {%endif%}
+   {%empty%}
+   {%include 'blank.html'%}
+   {%endfor%}
+   {%endif%}
+  </ul>
+  {%endfor%}
+ </div>

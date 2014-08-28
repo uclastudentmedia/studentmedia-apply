@@ -1,0 +1,37 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<form method="post" enctype="multipart/form-data">{%csrf_token%}
+<table>
+{%for field in form%}
+<tr>
+ <td>{{field.label_tag}}</td>
+ <td>{{field}}</td>
+ <td class="error">{%if field.errors%}{{field.errors}}{%endif%}</td>
+</tr>{%endfor%}
+</table>
+<br/>
+{%if attachments%}
+<table>
+<tr>
+<td>Attachment Type</td>
+<td>Attachment File</td>
+<td>Delete?</td>
+</tr>
+{%for attachment in attachments%}
+<tr>
+<td>
+{{attachment.type_string}}
+</td>
+<td><a href="{{attachment.file.url}}">{{attachment.filename}}</a></td>
+<td><input type="checkbox" name="delete" value="{{attachment.id}}"></td>
+</tr>
+{%endfor%}
+</table>
+{%endif%}
+<p>
+File Attachment: {{attachment_form.type}} {{attachment_form.file}}
+</p>
+<input type="submit" value="Save Changes"/>
+</form>
+{%endblock%}

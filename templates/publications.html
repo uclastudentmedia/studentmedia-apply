@@ -1,0 +1,93 @@
+{%extends 'base.html'%}
+
+{%block breadcrumbs%}
+<ul class="breadcrumb">
+ <li class="active">Media</li>
+</ul>
+{%endblock%}
+{%block content%}
+{%if exists%}
+<div class="row">
+ {%include 'publist.html' with publications=pubs.0%}
+ {%include 'publist.html' with publications=pubs.1%}
+ {%include 'publist.html' with publications=pubs.2%}
+</div>
+{%else%}
+{%include 'blank.html'%}
+{%endif%}
+{%if staff%}
+<form method='POST'>{%csrf_token%}
+ {%for list in pubs%}
+ {%for pub in list%}
+ <input type="hidden" id="order{{pub.id}}" name="{{pub.id}}" value="{{pub.rank}}">
+ {%endfor%}
+ {%endfor%}
+ <button type="submit" class="btn">Save ordering</button>
+</form>
+<div class="row">
+ <div class="span6 offset3">
+  <button title="add new publication" onclick="showEdit('new',true)" class="btn btn-block" id="buttoneditnew"><i class="icon-plus"></i></button>
+  <button title="stop adding new publication (doesn't save)" onclick="showEdit('new',false)" class="btn btn-block" id="buttonpostnew" style="display:none;"><i class="icon-minus"></i></button>
+  <div id="editnew" style="display:none;">
+   <form method="POST" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+    <legend><input class="input" placeholder="Title" name="title"><button class="btn" type="submit"><i class="icon-save"></i></button></legend>
+    <span class="help-block">You will not be able to edit the title once this publication is created.</span>
+    <textarea placeholder="This is a description of the media or program." class="input-block-level" rows="5" name="description"></textarea>
+    <input type="hidden" name="id" value="new">
+    <input type="checkbox" class="hidden" name="active">
+   </form>
+  </div>
+  <div id="postnew">
+  </div>
+ </div>
+</div>
+{%if staff%}
+<form id="form" method="post" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+ <input type="hidden" id="action" name="action" value="">
+ <input type="hidden" id="id" name="id" value="">
+</form>
+{%endif%}
+{%endif%}
+{%endblock%}
+{%block script%}
+{%if staff%}
+ranks = [{%for list in pubs%}{%for pub in list%}'{{pub.id}}'{%if not forloop.parentloop.last or not forloop.last%},{%endif%}{%endfor%}{%endfor%}];
+function showEdit(id,toggle) {
+	var edit='none';
+	var post='none';
+	if(toggle)
+		edit='';
+	else
+		post='';
+	document.getElementById('edit'+id).style.display=edit;
+	document.getElementById('post'+id).style.display=post;
+	document.getElementById('buttonedit'+id).style.display=post;
+	document.getElementById('buttonpost'+id).style.display=edit;
+}
+function editPub(action,id) {
+	if(confirm('Are you sure you want to '+action+' this publication?')) {
+		document.getElementById('action').value=action;
+		document.getElementById('id').value=id;
+		document.getElementById('form').submit();
+	}
+}
+function updateOrder(pub) {
+	var input = document.getElementById('order'+pub.id);
+	var old = input.value;
+	if(isNaN(pub.value)) {
+		pub.value = old;
+	} else {
+		input.value = pub.value;
+		for(var key in ranks) {
+			if(ranks[key] != pub.id) {
+				var rank = document.getElementById(ranks[key]);
+				if(rank.value == input.value) {
+					rank.value = old;
+					updateOrder(rank);
+				}
+			}
+		}
+	}
+}
+{%endif%}
+{%endblock%}

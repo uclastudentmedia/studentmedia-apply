@@ -1,0 +1,122 @@
+{%extends 'base.html'%}
+
+{%block breadcrumbs%}
+<ul class="breadcrumb">
+ <li class="active">People</li>
+</ul>
+{%endblock%}
+{%block content%}
+<form id="form">
+ <fieldset>
+  <legend>Search</legend>
+  <div class="row">
+   <div class="span3">
+    {{search_form.name}}
+   </div>
+   <div class="span3">
+    {{search_form.email}}
+   </div>
+   <div class="span3">
+    {{search_form.num_mob}}
+   </div>
+   <div class="span3">
+    {{search_form.num_prm}}
+   </div>
+  </div>
+  <div class="row">
+   <div class="span3">
+    {{search_form.addr_loc}}
+   </div>
+   <div class="span3">
+    {{search_form.addr_prm}}
+   </div>
+   <div class="span3">
+    {{search_form.major}}
+   </div>
+   <div class="span3">
+    {{search_form.high}}
+   </div>
+  </div>
+  <div class="row">
+   <div class="span3">
+    <label>Position</label>
+    {{search_form.status}}
+    {{search_form.position}}
+   </div>
+   <div class="span3">
+    <label>Gender</label>
+    {{search_form.gender}}
+   </div>
+   <div class="span3">
+    <label>Graduating Quarter</label>
+    {{search_form.quarter}}
+   </div>
+   <div class="span3">
+    <label>Graduating Year</label>
+    {{search_form.year_low}}
+    {{search_form.year_high}}
+   </div>
+  </div>
+  <div class="row">
+   <div class="span6 offset3">
+    <button type="submit" class="btn btn-primary btn-block"><i class="icon-search"></i></button>
+  </div>
+ </div>
+ </fieldset>
+ {%if people%}
+ <legend>Profiles <span class="muted">{{profile_count}}</span></legend>
+ <table class="table table-condensed table-hover">
+  <tr>
+   <th>Position</th>
+   <th>Name</th>
+   <th>Email</th>
+   <th>Graduating</th>
+  </tr>
+  {%for person in people%}
+  <tr>
+   <td>{{person.state}}{%if person.title%} - {{person.title}}{%endif%}</td>
+   <td><a href="{%url 'manageperson' person.id%}">{{person}}</a></td>
+   <td>{{person.email}}</td>
+   <td>{{person.quarter_string}} {{person.year}}</td>
+  </tr>
+  {%endfor%}
+ </table>
+ <input id="p" name="p" type="hidden" value="{{p}}">
+ <input id="pp" name="pp" type="hidden" value="{{pp}}">
+ <div class="pagination pagination-centered">
+  <ul>
+   <li class="{%if p > 1%}active"><a onclick="changePage({{p|add:-1}})"{%else%}disabled"><a{%endif%}><i class="icon-chevron-left"></i></a></li>
+   {%for page in page_range%}
+   <li class="{%if page != p%}active"><a onclick="changePage({{page}})"{%else%}disabled"><a{%endif%}>{{page}}</a></li>
+   {%endfor%}
+   <li class="{%if p < page_count%}active"><a onclick="changePage({{p|add:1}})"{%else%}disabled"><a{%endif%}><i class="icon-chevron-right"></i></a></li>
+  </ul>
+ </div>
+ <div class="btn-toolbar text-center">
+  <div class="btn-group">
+   {%for op in pp_op%}
+   <button class="btn" onclick="setPP({{op}})">{{op}}</button>
+   {%endfor%}
+  </div>
+  <div class="btn-group">
+   <button class="btn" onclick="setPP('all')">All</button>
+  </div>
+ </div>
+ {%else%}
+ <div class="alert alert-block">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  There's no one here!
+ </div>
+ {%endif%}
+</form>
+<script>
+function changePage(p) {
+	document.getElementById('p').value=p;
+	document.getElementById('form').submit();
+}
+function setPP(pp) {
+	document.getElementById('p').value=1;
+	document.getElementById('pp').value=pp;
+}
+</script>
+{%endblock%}

@@ -1,0 +1,164 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<div class="row">
+ <div class="span9 offset1">
+  <form method="post" enctype="multipart/form-data">{%csrf_token%}
+   <fieldset>
+    <legend title="{%firstof help_texts.personal 'personal'%}">Personal Information</legend>
+    <div class="row">
+     <div class="span3">
+      <label title="{%firstof help_texts.first 'first'%}">First{%if form.first.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.first%}
+     </div>
+     <div class="span3">
+      <label title="{%firstof help_texts.middle 'middle'%}">Middle{%if form.middle.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.middle%}
+     </div>
+     <div class="span3">
+      <label title="{%firstof help_texts.last 'last'%}">Last{%if form.last.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.last%}
+     </div>
+    </div>
+    <div class="row">
+     <div class="span3">
+      <label title="{%firstof help_texts.gender 'gender'%}">Gender{%if form.gender.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.gender%}
+     </div>
+     <div class="span3">
+      <label title="{%firstof help_texts.email 'email'%}">Email{%if form.email.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.email%}
+     </div>
+     <div class="span3">
+      <label title="{%firstof help_texts.student_id 'student_id'%}">Student ID{%if form.sid.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.sid%}
+     </div>
+    </div>
+    <div class="row">
+     <div class="span3">
+      <label title="{%firstof help_texts.major 'major'%}">Major{%if form.major.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.major%}
+     </div>
+     <div class="span3">
+      <label title="{%firstof help_texts.graduation_quarter 'graduation_quarter'%}">Expected Graduation Quarter{%if form.quarter.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.quarter%}
+     </div>
+     <div class="span3">
+      <label title="{%firstof help_texts.graduation_year 'graduation_year'%}">Expected Graduation Year{%if form.year.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.year%}
+     </div>
+    </div>
+    <div class="row">
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.birthday 'birthday'%}">Date of Birth{%if form.birth.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.birth%}
+     </div>
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.picture 'picture'%}">Self Photo{%if form.picture.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      <div class="control-group">
+       <div class="controls">
+        {%if profile.picture%}
+        Currently:
+        <a href="{{profile.picture.url}}">{{profile.filename}}</a>
+        &nbsp;
+        <input id="picture-clear_id" name="picture-clear" type="checkbox"><label for="picture-clear_id">Clear</label>
+        {%endif%}
+        <input id="id_picture" name="picture" type="file">
+        {%if form.picture.errors%}
+        <span class="help-inline">
+         <ul class="unstyled">
+          {%for error in form.picture.errors%}
+          <li>{{error}}</li>
+          {%endfor%}
+         </ul>
+        </span>
+        {%endif%}
+       </div>
+      </div>
+     </div>
+    </div>
+   </fieldset>
+   <fieldset>
+    <legend title="{%firstof help_texts.contact 'contact'%}">Contact Information</legend>
+    <div class="row">
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.mobile_number 'mobile_number'%}">Mobile Phone Number{%if form.phone_mob.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.phone_mob%}
+     </div>
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.permanent_number 'permanent_number'%}">Permanent Phone Number{%if form.phone_perm.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.phone_perm%}
+     </div>
+    </div>
+    <div class="row">
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.local_address 'local_address'%}">Local Address</label>
+      {%include 'field.html' with field=form.add1_local indicate=True%}
+      {%include 'field.html' with field=form.add2_local indicate=True%}
+      {%include 'field.html' with field=form.city_local indicate=True%}
+      {%include 'field.html' with field=form.state_local indicate=True%}
+      {%include 'field.html' with field=form.postal_local indicate=True%}
+     </div>
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.permanent_address 'permanent_address'%}">Permanent Address</label>
+      {%include 'field.html' with field=form.add1_perm indicate=True%}
+      {%include 'field.html' with field=form.add2_perm indicate=True%}
+      {%include 'field.html' with field=form.city_perm indicate=True%}
+      {%include 'field.html' with field=form.state_perm indicate=True%}
+      {%include 'field.html' with field=form.postal_perm indicate=True%}
+     </div>
+    </div>
+   </fieldset>
+   <fieldset>
+    <legend title="{%firstof help_texts.background 'background'%}">Background Information</legend>
+    <div class="row">
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.highschool 'highschool'%}">High School</label>
+      {%include 'field.html' with field=form.high indicate=True%}
+      {%include 'field.html' with field=form.city_high indicate=True%}
+    </div>
+     <div class="span3 offset1">
+      <label title="{%firstof help_texts.website 'website'%}">{%if profile.website%}<a href="{{profile.website_url}}" target="_blank">Personal Website/Blog</a>{%else%}Personal Website/Blog{%endif%}{%if form.website.field.required%}<span class="text-error">*</span>{%endif%}</label>
+      {%include 'field.html' with field=form.website%}
+     </div>
+    </div>
+   </fieldset>
+{%comment%}
+   <fieldset>
+    <legend title="{%firstof help_texts.attachments 'attachments'%}">Attachments</legend>
+    <table class="table">
+     <tr>
+      <th title="{%firstof help_texts.attachment_type 'attachment_type'%}">Type</th>
+      <th>File</th>
+      <th><i class="icon-trash"></i></th>
+     </tr>
+     {%for attachment in attachments%}
+     <tr>
+      <td>{{attachment.type}}</td>
+      <td><a href="{{attachment.file.url}}" target="_blank">{{attachment.filename}}</a></td>
+      <td>
+       {%if attachment.deletable%}
+       <input type="checkbox" name="delete" value="{{attachment.id}}">
+       {%else%}
+       <i class="icon-link" title="This attachment is already associated to an application and cannot be deleted."></i>
+       {%endif%}
+      </td>
+     </tr>
+     {%endfor%}
+     <tr>
+      <td>{%include 'field.html' with field=attachment_form.type%}</td>
+      <td>{%include 'field.html' with field=attachment_form.file%}</td>
+      <td></td>
+     </tr>
+    </table>
+   </fieldset>
+{%endcomment%}
+   <div class="row">
+    <div class="span7 offset1">
+     <button class="btn btn-primary btn-block" type="submit"><i class="icon-save"></i></button>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>
+{%endblock%}

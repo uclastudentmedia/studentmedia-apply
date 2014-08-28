@@ -1,0 +1,168 @@
+{%extends 'base.html'%}
+
+
+{%block content%}
+<div class="docs-header-icon">
+ <h1>Steps to Apply</h1>
+ <p class="lead">
+  <a style="color:#3498DB;" href="{%url 'register'%}">Register.</a> &nbsp;
+  <i class="icon-caret-right"></i> &nbsp;
+  <a style="color:#3498DB;" href="{%url 'profile'%}">Complete profile.</a> &nbsp;
+  <i class="icon-caret-right"></i> &nbsp;
+  <a style="color:#3498DB;" href="{%url 'applications'%}">Submit an application.</a> &nbsp;
+ </p>
+</div>
+<div class="row">
+ <div class="span8">
+  {%if staff%}
+  <div class="row">
+   <div class="span4 offset2">
+    <div class="">
+     <button title="add new post" onclick="showEdit('new',true)" class="btn btn-block" id="buttoneditnew"><i class="icon-plus"></i></button>
+     <button title="stop adding new post (doesn't save)" onclick="showEdit('new',false)" class="btn btn-block" id="buttonpostnew" style="display:none;"><i class="icon-minus"></i></button>
+     <div id="editnew" style="display:none;">
+      <form method="POST" action="{%url 'managenews'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+       <input name="id" type="hidden" value="new">
+       <legend><input class="input-xlarge" name="title" value="Title"><button type="submit" class="btn"><i class="icon-save"></i></button></legend>
+       <textarea class="input-block-level" name="content" rows="5">{{item.content}}</textarea>
+      </form>
+     </div>
+     <div id="postnew">
+     </div>
+    </div>
+   </div>
+  </div>
+  {%endif%}
+  {%for item in news%}
+  {%if item.publish or staff%}
+  <div class="">
+   <div id="post{{item.id}}">
+    <legend>
+     {{item.title}}
+     <small>{{item.date|date}}</small>
+     {%if item.staff%}
+     <small class="text-info"> News for Editors </small>
+     {%endif%}
+     {%if not item.publish%}
+     <small class="text-error"> Not Published </small>
+     {%endif%}
+    </legend>
+    <p style="white-space:pre-wrap;">{%autoescape off%}{{item.content}}{%endautoescape%}</p>
+   </div>
+   {%if staff%}
+   <div id="edit{{item.id}}" style="display:none;">
+    <form method="POST" action="{%url 'managenews'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+     <input name="id" type="hidden" value="{{item.id}}">
+     <input name="publish" type="checkbox" class="hidden"{%if item.publish%} checked{%endif%}>
+     <legend><input class="input-xlarge" name="title" value="{{item.title}}"><button type="submit" class="btn"><i class="icon-save"></i></button></legend>
+     <textarea class="input-block-level" name="content" rows="5">{%autoescape off%}{{item.content}}{%endautoescape%}</textarea>
+    </form>
+   </div>
+   <div class="btn-group">
+    <button title="make {%if item.publish%}private{%else%}public{%endif%}" onclick="editNews('toggle',{{item.id}})" class="btn"><i class="icon-eye-{%if item.publish%}close{%else%}open{%endif%}"></i></button>
+    <button title="turn into {%if item.staff%}public{%else%}staff{%endif%} news" onclick="editNews('staff-toggle',{{item.id}})" class="btn"><i class="icon-star{%if item.staff%}-empty{%endif%}"></i></button>
+    <button title="edit post" onclick="showEdit({{item.id}},true)" class="btn" id="buttonedit{{item.id}}"><i class="icon-edit"></i></button>
+    <button title="stop editing post (doesn't save)" onclick="showEdit({{item.id}},false)" class="btn" id="buttonpost{{item.id}}" style="display:none;"><i class="icon-remove"></i></button>
+    <button title="refresh post date to current time" onclick="editNews('refresh',{{item.id}})" class="btn"><i class="icon-refresh"></i></button>
+    <button title="delete post" onclick="editNews('delete',{{item.id}})" class="btn"><i class="icon-trash"></i></button>
+   </div>
+   {%endif%}
+  </div>
+  {%endif%}
+  {%endfor%}
+  <div class="pagination pagination-centered">
+   <form method="GET" id="paginator">
+    <input id="p" name="p" type="hidden" value="{{p}}">
+    <input id="pp" name="pp" type="hidden" value="{{pp}}">
+    {%if staff%}
+    <input id="staff" name="staff" type="hidden" value="{%firstof request.GET.staff '0'%}">
+    {%endif%}
+   </form>
+   <ul>
+    <li class="{%if p > 1%}active"><a onclick="changePage({{p|add:-1}})"{%else%}disabled"><a{%endif%}><i class="icon-chevron-left"></i></a></li>
+    {%for page in page_range%}
+    <li class="{%if page != p%}active"><a onclick="changePage({{page}})"{%else%}disabled"><a{%endif%}>{{page}}</a></li>
+    {%endfor%}
+    <li class="{%if p < page_count%}active"><a onclick="changePage({{p|add:1}})"{%else%}disabled"><a{%endif%}><i class="icon-chevron-right"></i></a></li>
+   </ul>
+  </div>
+  <div class="btn-toolbar text-center">
+   <div class="btn-group">
+    {%for op in pp_op%}
+    <button class="btn" onclick="setPP({{op}})">{{op}}</button>
+    {%endfor%}
+   </div>
+   <div class="btn-group">
+    <button class="btn" onclick="setPP('all')">All</button>
+    {%if staff%}
+    <button title="show {%if request.GET.staff == '1'%}all{%else%}only staff{%endif%} news" type="button" class="btn" onclick="toggleStaff()"><i class="icon-star{%ifequal request.GET.staff '1'%}-empty{%endifequal%}"></i></button>
+    {%endif%}
+   </div>
+  </div>
+ </div>
+ <div class="span4">
+  <div class="">
+   <legend>Currently Open Applications</legend>
+   {%for application in open_applications%}
+   <h5><a href="{%url 'apply' pub=application.position.publication.slug pos=application.position.slug app=application.slug%}">{{application.full_name}}</a></h5>
+   <small class="text-error">Deadline: {{application.close}}</small>
+   {%empty%}
+   {%include 'blank.html' with blank_type='applications'%}
+   {%endfor%}
+  </div>
+  <div class="">
+   <legend>Upcoming Applications</legend>
+   {%for application in pending_applications%}
+   <h5><a href="{%url 'apply' pub=application.position.publication.slug pos=application.position.slug app=application.slug%}">{{application.full_name}}</a></h5>
+   <small class="muted">Opens: {{application.open}}</small>
+   &sdot;
+   <small class="text-error">Deadline: {{application.close}}</small>
+   {%empty%}
+   {%include 'blank.html' with blank_type='applications'%}
+   {%endfor%}
+  </div>
+ </div>
+</div>
+<form method="POST" id="form" action="{%url 'managenews'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
+ <input type="hidden" id="action" name="action" value="">
+ <input type="hidden" id="id" name="id" value="">
+</form>
+{%endblock%}
+{%block script%}
+{%if staff%}
+function showEdit(id,toggle) {
+	var edit='none';
+	var post='none';
+	if(toggle)
+		edit='';
+	else
+		post='';
+	document.getElementById('edit'+id).style.display=edit;
+	document.getElementById('post'+id).style.display=post;
+	document.getElementById('buttonedit'+id).style.display=post;
+	document.getElementById('buttonpost'+id).style.display=edit;
+}
+function editNews(action,id) {
+	if(confirm('Are you sure you want to '+action+' this post?')) {
+	document.getElementById('action').value=action;
+	document.getElementById('id').value=id;
+	document.getElementById('form').submit();
+	}
+}
+function toggleStaff() {
+	var staff = document.getElementById('staff');
+	if(staff.value == '1') staff.value='0';
+	else staff.value='1';
+	document.getElementById('paginator').submit();
+}
+{%endif%}
+function changePage(p) {
+	document.getElementById('p').value=p;
+	document.getElementById('paginator').submit();
+}
+function setPP(pp) {
+	document.getElementById('p').value=1;
+	document.getElementById('pp').value=pp;
+	document.getElementById('paginator').submit();
+}
+{%endblock%}

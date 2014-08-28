@@ -1,0 +1,117 @@
+{%extends 'base.html'%}
+
+{%block breadcrumbs%}
+<ul class="breadcrumb">
+ <li><a href="{%url 'applications'%}">Media</a></li>
+ <li><a href="{%url 'publication' application.position.publication.slug%}">{{application.position.publication}}</a></li>
+ <li><a href="{%url 'position' pub=application.position.publication.slug pos=application.position.slug%}">{{application.position.title}}</a></li>
+ <li class="active">{{application.quarter_string}} {{application.year}}</li>
+</ul>
+{%endblock%}
+{%block content%}
+<form class="form-search" method='POST' enctype="multipart/form-data">{%csrf_token%}
+<div class="row">
+ <div class="span8 offset2">
+  <p style="white-space:pre-wrap;">{%autoescape off%}{{application.notice}}{%endautoescape%}</p>
+  {%if application.appattachment_set.exists%}
+  <legend>Attached Files</legend>
+  <ul class="unstyled">
+   {%for attachment in application.appattachment_set.all%}
+   <li><a href="{{attachment.file.url}}">{{attachment.name}}</a></li>
+   {%endfor%}
+  </ul>
+  {%endif%}
+  {%for section in app%}
+  <section>
+   <legend>{{section.title}}</legend>
+   <p style="white-space:pre-wrap;">{{section.text}}</p>
+   {%for question in section.questions%}
+   <div class="row">
+    <div class="span3">
+     <label title="{{question.help}}">{{question.text}}</label>
+    </div>
+    <div class="span5 control-group{%if indicate_invalid and not question.valid%} error{%endif%}">
+     {%if question.type == 'radio' or question.type == 'checkbox'%}
+     <ul class="unstyled">
+      {%for choice in question.answer%}
+      <li>
+       <label class="{{question.type}}">
+        <input {%if not editable%}disabled {%endif%}type="{{question.type}}" name="{{forloop.parentloop.parentloop.counter0}}.{{forloop.parentloop.counter0}}" value="{{forloop.counter0}}"{%if choice.chosen%} checked{%endif%}>
+        {{choice.text}}
+       </label>
+      </li>
+      {%endfor%}
+     </ul>
+     {%elif question.type == 'text'%}
+     <textarea class="input-block-level" rows="7" {%if not editable%}disabled {%endif%}name="{{forloop.parentloop.counter0}}.{{forloop.counter0}}">{{question.answer}}</textarea>
+     {%else%}
+     <div class="input-append">
+      <input type="file" {%if not editable%}disabled {%endif%}id="file{{forloop.parentloop.counter0}}.{{forloop.counter0}}" style="display:none;">
+      <select id="select{{forloop.parentloop.counter0}}.{{forloop.counter0}}" {%if not editable%}disabled {%endif%}name="{{forloop.parentloop.counter0}}.{{forloop.counter0}}">
+       <option value="0">----</option>
+       {%for attachment in question.answer%}
+       <option value="a{{attachment.id}}"{%if attachment.chosen%} selected{%endif%}>{{attachment.filename}}</option>
+       {%endfor%}
+      </select>
+      <span class="add-on">{{question.attachmenttype}}</span>
+     </div>
+     <span class="help-block" title="This prevents multiple uploads of the same file for multiple applications.">
+      {%for attachment in question.answer%}{%if attachment.chosen%}Currently: <a href="{{attachment.url}}">{{attachment.filename}}</a><br/>{%endif%}{%endfor%}
+      <button type="button" class="btn btn-link" onclick="switchTo('file','{{forloop.parentloop.counter0}}.{{forloop.counter0}}','select')">Upload new file</button>
+      &sdot;
+      <button type="button" class="btn btn-link" onclick="switchTo('select','{{forloop.parentloop.counter0}}.{{forloop.counter0}}','file')">Reuse existing file</button>
+     </span>
+     {%endif%}
+    </div>
+   </div><br/>
+   {%endfor%}
+  </section>
+  {%endfor%}
+  <div class="row">
+   <div class="span5 offset3">
+    {%if application.is_on_hold%}
+    <p>This application is a draft. It plans to open on {{application.open}}</p>
+    {%elif application.is_pending%}
+    <p>This application will open on {{application.open}}</p>
+    {%elif not application.is_open%}
+    <p>This application closed on {{application.close}}</p>
+    {%endif%}
+    {%if request.user.is_authenticated%}
+    {%if not entry.applicant.profile%}
+    <p>
+     Please complete your <a href="{%url 'profile'%}?next={{request.get_full_path|urlencode}}">profile</a> before submitting. However, you may still save and come back to this application later.
+    </p>
+    {%endif%}
+    <div class="badge {{color}}">
+     {{status}}
+    </div><br/>
+    {%if application.is_open and entry.status == INCOMPLETE%}
+    <div class="input-append">
+     <select name='action' class="search-query">
+      <option value='sav'>Save</option>
+      <option value='sub'>Submit</option>
+     </select>
+     <button type="submit" class="btn"><i class="icon-arrow-right"></i></button>
+    </div>
+    {%endif%}
+    {%else%}
+    <p>
+     <a href="{%url 'login'%}?next={{request.get_full_path|urlencode}}">Log in</a> or <a href="{%url 'register'%}?=next={{request.get_full_path|urlencode}}">Register</a> to apply
+    </p>
+    {%endif%}
+   </div>
+  </div>
+ </div>
+</div>
+</form>
+{%endblock%}
+{%block script%}
+function switchTo(show,id,hide) {
+	showElement = document.getElementById(show+id);
+	hideElement = document.getElementById(hide+id);
+	hideElement.name = '';
+	hideElement.style.display = 'none';
+	showElement.name = id;
+	showElement.style.display = '';
+}
+{%endblock%}

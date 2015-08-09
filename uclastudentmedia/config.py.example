@@ -1,0 +1,31 @@
+# Copy this file and name it config.py in the same directory
+# In config.py, replace occurrences of <INSERT HERE> appropriately
+
+# Make sure to set to False in production
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django',          # Name of database
+        'USER': 'django',
+        'PASSWORD': '<INSERT HERE>',  # If there is no password delete this whole line. Do not set password to empty string.
+        'HOST': 'localhost',          # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',                   # SHOULD be set to empty for default.
+    }
+}
+
+# The name of your domains as strings in a list.
+# Example: ALLOWED_HOSTS = ['dailybruin.com']
+# Needed if DEBUG is False
+ALLOWED_HOSTS = []
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'donotreply.mail-<INSERT HERE>@media.ucla.edu'       # Example: 'donotreply.mail-daemon@media.ucla.edu'
+EMAIL_HOST_PASSWORD = '<INSERT HERE>'
+
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = '<INSERT HERE>'

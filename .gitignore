@@ -1,3 +1,6 @@
 *pyc
 collectstatic/
 media/
+
+# Put configurable settings and passwords here
+uclastudentmedia/config.py

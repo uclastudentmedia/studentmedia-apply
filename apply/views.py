@@ -23,8 +23,16 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.utils import simplejson, timezone
 from forms import *
 from models import *
+from django.core.exceptions import MultipleObjectsReturned
 
-APPLICANT = ProfileStatus.objects.get(name__icontains='applicant')
+try:
+	APPLICANT = ProfileStatus.objects.get(name__icontains='applicant')
+except ProfileStatus.DoesNotExist:
+	APPLICANT = ProfileStatus.objects.create(name='ApplMultipleObjectsReturnedicant')
+except MultipleObjectsReturned:
+	APPLICANT = ProfileStatus.objects.all()[0]
+	print("ERROR: original developer intended for only one Profile Status to contain the word 'Applicant'")
+
 donotreply = 'This email is from the UCLA Student Media application website. Do not respond directly to this email address.\nSend your reply to:'
 subject_prefix = 'Apply: UCLA Student Media - '
 

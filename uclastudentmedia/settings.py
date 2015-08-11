@@ -132,6 +132,7 @@ INSTALLED_APPS = (
     'apply',
 
     'south',
+    'mailer',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -165,7 +166,8 @@ LOGGING = {
 LOGIN_URL = '/login/'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'mailer.backend.DbBackend'
+MAILER_EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = config.EMAIL_USE_TLS
 EMAIL_HOST = config.EMAIL_HOST
 EMAIL_PORT = config.EMAIL_PORT

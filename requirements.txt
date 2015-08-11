@@ -1,6 +1,8 @@
 #  This was generated using 'pip freeze' from the global environment.
 #  Some of it is unncecessary.
-#  Important: django, south, psycopg, gunicorn, requests
+#  Important: django, south, psycopg, gunicorn, requests, django-mailer
+
+django-mailer==1.1
 
 Cheetah==2.4.4
 Django==1.6.11

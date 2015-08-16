@@ -62,7 +62,7 @@
 <span id="postdescnew" class="hidden"></span>
 <div class="row">
  <div class="span4 offset4">
-  <button title="add a new position to this publicaiton" id="buttoneditnew" class="btn btn-block" onclick="showPosEdit('new',true)"><i class="icon-plus"></i></button>
+  <button title="add a new position to this publicaiton" id="buttoneditnew" class="btn btn-block" onclick="showPosEdit('new',true)"><i class="icon-plus"> Add a New Position</i></button>
   <button title="stop creating new position" id="buttonpostnew" class="btn btn-block" onclick="showPosEdit('new',false)" style="display:none;"><i class="icon-minus"></i></button>
   <form method="POST" action="{%url 'manageposition'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
    <input type="hidden" name="publication" value="{{publication.id}}">

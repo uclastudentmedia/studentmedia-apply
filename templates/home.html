@@ -18,7 +18,7 @@
   <div class="row">
    <div class="span4 offset2">
     <div class="">
-     <button title="add new post" onclick="showEdit('new',true)" class="btn btn-block" id="buttoneditnew"><i class="icon-plus"></i></button>
+     <button title="add new post" onclick="showEdit('new',true)" class="btn btn-block" id="buttoneditnew"><i class="icon-plus"></i> Add New Post to Home Page</button>
      <button title="stop adding new post (doesn't save)" onclick="showEdit('new',false)" class="btn btn-block" id="buttonpostnew" style="display:none;"><i class="icon-minus"></i></button>
      <div id="editnew" style="display:none;">
       <form method="POST" action="{%url 'managenews'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}

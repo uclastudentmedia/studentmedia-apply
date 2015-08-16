@@ -1,6 +1,27 @@
 # studentmedia-apply
 Application website for UCLA Student Media.
 
+## Setting up locally
+
+Requirements
+* [Python](https://www.python.org/) 2.6.5 or later
+* [pip](https://pip.pypa.io/en/stable/installing.html)
+* [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)
+* [PostgreSQL](http://www.postgresql.org/download/)
+
+Open postgres shell with `psql` command. In sql shell, create a database for the site and user
+
+	CREATE DATABASE django;
+	CREATE ROLE django SUPERUSER LOGIN PASSWORD 'django';
+
+Then quit the shell (`\q`)
+
+Follow same instructions below from cloning the repository to the running `./manage.py loaddata initial`
+
+Then to run the site locally (by default will be at localhost:8000)
+	
+	./manage.py runserver
+	
 ## Deploying on [digitalocean](https://www.digitalocean.com/)
 Select the premade image of Django on Ubuntu.  After logging in as 'root', you will see the credentials for the 'django' for you to use from now on.
 

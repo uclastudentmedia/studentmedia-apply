@@ -1,0 +1,1 @@
+The files in this directory are not actually used by the application anywhere. They're just being used to save the content of descriptions/posts because the application's editors compresses html.

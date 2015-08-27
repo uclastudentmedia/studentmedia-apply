@@ -28,7 +28,8 @@
    {%for question in section.questions%}
    <div class="row">
     <div class="span3">
-     <label title="{{question.help}}">{{question.text}}</label>
+     <div>{{question.text}}</div>
+     <div class="help-text">{{question.help}}</div>
     </div>
     <div class="span5 control-group{%if indicate_invalid and not question.valid%} error{%endif%}">
      {%if question.type == 'radio' or question.type == 'checkbox'%}

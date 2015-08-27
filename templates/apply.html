@@ -1,5 +1,15 @@
 {%extends 'base.html'%}
 
+
+{% block extra_style %}
+<style>
+  .help-text {
+    font-style: italic;
+    color: #ABB7B7;
+  }
+</style>
+{% endblock %}
+
 {%block breadcrumbs%}
 <ul class="breadcrumb">
  <li><a href="{%url 'applications'%}">Media</a></li>

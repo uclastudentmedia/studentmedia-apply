@@ -1,16 +1,51 @@
 [
 {
-    "pk": 1,
-    "model": "apply.profilestatus",
+    "pk": 1, 
+    "model": "apply.attachmenttype", 
     "fields": {
-        "name": "Applicant"
+        "name": "Resume"
     }
 },
 {
-    "pk": 1,
-    "model": "apply.attachmenttype",
+    "pk": 2, 
+    "model": "apply.attachmenttype", 
     "fields": {
-        "name": "Resume"
+        "name": "Writing Sample"
+    }
+},
+{
+    "pk": 3, 
+    "model": "apply.attachmenttype", 
+    "fields": {
+        "name": "Design Sample"
+    }
+},
+{
+    "pk": 4, 
+    "model": "apply.attachmenttype", 
+    "fields": {
+        "name": "Photo Sample"
+    }
+},
+{
+    "pk": 5, 
+    "model": "apply.attachmenttype", 
+    "fields": {
+        "name": "Graphics Mockup"
+    }
+},
+{
+    "pk": 6, 
+    "model": "apply.attachmenttype", 
+    "fields": {
+        "name": "Illustration Sample"
+    }
+},
+{
+    "pk": 7, 
+    "model": "apply.attachmenttype", 
+    "fields": {
+        "name": "Copy Exercise"
     }
 }
 ]

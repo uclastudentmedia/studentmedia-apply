@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty32"
+  config.vm.hostname = 'studentmedia-dev'
+  config.vm.network :forwarded_port, host: 8080, guest: 80,   autocorrect: true
+  config.vm.network :forwarded_port, host: 8000, guest: 8000, autocorrect: true
+  
+  config.vm.provision :shell, path: "bootstrap.sh"
+
+  config.vm.synced_folder "../../studentmedia-apply", "/home/vagrant/studentmedia-apply"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "studentmedia_env"
+  end
+    
+end

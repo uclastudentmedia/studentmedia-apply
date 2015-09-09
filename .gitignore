@@ -1,6 +1,7 @@
 *pyc
 collectstatic/
 media/
+.vagrant
 
 # Put configurable settings and passwords here
 uclastudentmedia/config.py

@@ -825,6 +825,72 @@ def entriesJson(request):
 	json = dict(enumerate(Entry.objects.values('id','status','application__quarter','application__year','application__position__title','application__position__publication__title','applicant__profile__first','applicant__profile__middle','applicant__profile__last','applicant__username','applicant__profile__email','submit')))
 	return HttpResponse(simplejson.dumps(json,default=lambda obj: obj.strftime('%D, %I:%M:%S %p')),mimetype='application/json')
 
+def get_entries(request):
+    """Helper function that filters applicants based on url query string.
+       For the manageEntries() view"""
+    entries = Entry.objects.all()
+
+    get_pub = request.GET.getlist('pub',[])
+    if get_pub:
+        entries = entries.filter(application__position__publication__slug__in=get_pub)
+    get_pos = request.GET.getlist('pos',[])
+    if get_pos:
+        entries = entries.filter(application__position__slug__in=get_pos)
+    get_e_quarter = request.GET.getlist('e_quarter',[])
+    if get_e_quarter:
+        entries = entries.filter(quarter__in=get_e_quarter)
+    get_e_year = request.GET.getlist('e_year',[])
+    if get_e_year:
+        entries = entries.filter(year__in=get_e_year)
+    entry_statuses = request.GET.getlist('entry_status',[])
+    if entry_statuses:
+        entries = entries.filter(status__in=entry_statuses)
+    statuses = request.GET.getlist('status',[])
+    if statuses:
+        entries = entries.filter(applicant__profile__state__id__in=statuses)
+    genders = request.GET.getlist('gender',[])
+    if genders:
+        entries = entries.filter(applicant__profile__gender__in=genders)
+    quarters = request.GET.getlist('quarter',[])
+    if quarters:
+        entries = entries.filter(applicant__profile__quarter__in=quarters)
+    if get_contains(request,'name'):
+        for val in request.GET['name'].split(' '):
+            entries = entries.filter(Q(applicant__profile__first__icontains=val)|Q(applicant__profile__middle__icontains=val)|Q(applicant__profile__last__icontains=val))
+    if get_contains(request,'email'):
+        for val in request.GET['email'].split(' '):
+            entries = entries.filter(applicant__profile__email__icontains=val)
+    if get_contains(request,'num_mob'):
+        entries = entries.filter(applicant__profile__phone_mob__icontains=request.GET['num_mob'])
+    if get_contains(request,'num_prm'):
+        entries = entries.filter(applicant__profile__phone_perm__icontains=request.GET['num_prm'])
+    if get_contains(request,'addr_loc'):
+        for val in request.GET['addr_loc'].split(' '):
+            entries = entries.filter(Q(applicant__profile__add1_local__icontains=val)|Q(applicant__profile__add2_local__icontains=val)|Q(applicant__profile__city_local__icontains=val)|Q(applicant__profile__state_local__icontains=val)|Q(applicant__profile__postal_local__icontains=val))
+    if get_contains(request,'addr_prm'):
+        for val in request.GET['addr_prm'].split(' '):
+            entries = entries.filter(Q(applicant__profile__add1_perm__icontains=val)|Q(applicant__profile__add2_perm__icontains=val)|Q(applicant__profile__city_perm__icontains=val)|Q(applicant__profile__state_perm__icontains=val)|Q(applicant__profile__postal_perm__icontains=val))
+    if get_contains(request,'major'):
+        for val in request.GET['major'].split(' '):
+            entries = entries.filter(applicant__profile__major__icontains=val)
+    if get_contains(request,'year_low'):
+        entries = entries.filter(applicant__profile__year__gte=request.GET['year_low'])
+    if get_contains(request,'year_high'):
+        entries = entries.filter(applicant__profile__year__lte=request.GET['year_high'])
+    if get_contains(request,'high'):
+        for val in request.GET['high'].split(' '):
+            entries = entries.filter(Q(applicant__profile__high__icontains=val)|Q(applicant__profile__city_high__icontains=val))
+    userlist = list(set([e['applicant__id'] for e in entries.values('applicant__id')]))
+    users = User.objects.filter(pk__in=userlist)
+    ufilter = request.GET.getlist('ufilter',[])
+    if ufilter:
+        dup_users = users.annotate(Count('entry')).filter(entry__count__gt=1)
+        if 'u' in ufilter:
+            entries = entries.exclude(applicant__in=dup_users)
+        if 'd' in ufilter:
+            entries = entries.filter(applicant__in=dup_users)
+    return entries
+
 @csrf_protect
 @staff_member_required
 def manageEntries(request):
@@ -849,69 +915,9 @@ def manageEntries(request):
 		else:
 			apps[str(application.slug)] = {'text':str(application),'poss':[str(application.position.slug)]}
 	pubs = {}
-	entries = Entry.objects.all()
-	get_pub = request.GET.getlist('pub',[])
-	get_pos = request.GET.getlist('pos',[])
-	#get_app = request.GET.getlist('app',[])
-	get_e_quarter = request.GET.getlist('e_quarter',[])
-	get_e_year = request.GET.getlist('e_year',[])
-	if get_pub:
-		entries = entries.filter(application__position__publication__slug__in=get_pub)
-	if get_pos:
-		entries = entries.filter(application__position__slug__in=get_pos)
-	#if get_app:
-	#	entries = entries.filter(application__slug__in=get_app)
-	if get_e_quarter:
-		entries = entries.filter(quarter__in=get_e_quarter)
-	if get_e_year:
-		entries = entries.filter(year__in=get_e_year)
-	entry_statuses = request.GET.getlist('entry_status',[])
-	if entry_statuses:
-		entries = entries.filter(status__in=entry_statuses)
-	statuses = request.GET.getlist('status',[])
-	if statuses:
-		entries = entries.filter(applicant__profile__state__id__in=statuses)
-	genders = request.GET.getlist('gender',[])
-	if genders:
-		entries = entries.filter(applicant__profile__gender__in=genders)
-	quarters = request.GET.getlist('quarter',[])
-	if quarters:
-		entries = entries.filter(applicant__profile__quarter__in=quarters)
-	if get_contains(request,'name'):
-		for val in request.GET['name'].split(' '):
-			entries = entries.filter(Q(applicant__profile__first__icontains=val)|Q(applicant__profile__middle__icontains=val)|Q(applicant__profile__last__icontains=val))
-	if get_contains(request,'email'):
-		for val in request.GET['email'].split(' '):
-			entries = entries.filter(applicant__profile__email__icontains=val)
-	if get_contains(request,'num_mob'):
-		entries = entries.filter(applicant__profile__phone_mob__icontains=request.GET['num_mob'])
-	if get_contains(request,'num_prm'):
-		entries = entries.filter(applicant__profile__phone_perm__icontains=request.GET['num_prm'])
-	if get_contains(request,'addr_loc'):
-		for val in request.GET['addr_loc'].split(' '):
-			entries = entries.filter(Q(applicant__profile__add1_local__icontains=val)|Q(applicant__profile__add2_local__icontains=val)|Q(applicant__profile__city_local__icontains=val)|Q(applicant__profile__state_local__icontains=val)|Q(applicant__profile__postal_local__icontains=val))
-	if get_contains(request,'addr_prm'):
-		for val in request.GET['addr_prm'].split(' '):
-			entries = entries.filter(Q(applicant__profile__add1_perm__icontains=val)|Q(applicant__profile__add2_perm__icontains=val)|Q(applicant__profile__city_perm__icontains=val)|Q(applicant__profile__state_perm__icontains=val)|Q(applicant__profile__postal_perm__icontains=val))
-	if get_contains(request,'major'):
-		for val in request.GET['major'].split(' '):
-			entries = entries.filter(applicant__profile__major__icontains=val)
-	if get_contains(request,'year_low'):
-		entries = entries.filter(applicant__profile__year__gte=request.GET['year_low'])
-	if get_contains(request,'year_high'):
-		entries = entries.filter(applicant__profile__year__lte=request.GET['year_high'])
-	if get_contains(request,'high'):
-		for val in request.GET['high'].split(' '):
-			entries = entries.filter(Q(applicant__profile__high__icontains=val)|Q(applicant__profile__city_high__icontains=val))
-	userlist = list(set([e['applicant__id'] for e in entries.values('applicant__id')]))
-	users = User.objects.filter(pk__in=userlist)
-	ufilter = request.GET.getlist('ufilter',[])
-	if ufilter:
-		dup_users = users.annotate(Count('entry')).filter(entry__count__gt=1)
-		if 'u' in ufilter:
-			entries = entries.exclude(applicant__in=dup_users)
-		if 'd' in ufilter:
-			entries = entries.filter(applicant__in=dup_users)
+
+	entries = get_entries(request)
+
 	if get_contains(request,'p'):
 		p = int(request.GET['p'])
 	if get_contains(request,'pp'):

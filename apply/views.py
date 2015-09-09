@@ -482,12 +482,15 @@ def managePeople(request):
 	statuses = request.GET.getlist('status',[])
 	if statuses:
 		people = people.filter(state__id__in=statuses)
+
 	genders = request.GET.getlist('gender',[])
-	if genders:
-		people = people.filter(gender__in=genders)
+	if genders and genders[0] != '':
+		for val in request.GET['gender'].split(' '):
+			people = people.filter(gender__iexact=val)
+
 	quarters = request.GET.getlist('quarter',[])
 	if quarters:
-		people = people.filter(quarter__in=quarterse)
+		people = people.filter(quarter__in=quarters)
 	if get_contains(request,'position'):
 		for val in request.GET['position'].split(' '):
 			people = people.filter(title__icontains=val)
@@ -849,8 +852,9 @@ def get_entries(request):
     if statuses:
         entries = entries.filter(applicant__profile__state__id__in=statuses)
     genders = request.GET.getlist('gender',[])
-    if genders:
-        entries = entries.filter(applicant__profile__gender__in=genders)
+    if genders and genders[0] != '':
+        for val in request.GET['gender'].split(' '):
+            entries = entries.filter(applicant__profile__gender__iexact=val)
     quarters = request.GET.getlist('quarter',[])
     if quarters:
         entries = entries.filter(applicant__profile__quarter__in=quarters)
@@ -894,6 +898,9 @@ def get_entries(request):
 @csrf_protect
 @staff_member_required
 def manageEntries(request):
+    # TODO: at the url /manage/entries the 'Entries' count currently includes applications submitted by
+    # applicants without a profile but the list below does not show the applications.
+    #  Should note that somewhere or give option to view those applications
 	context = baseContext(request,'managepeople')
 	search_form = EntrySearchForm(request.GET)
 	p = 1

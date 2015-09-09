@@ -84,12 +84,6 @@ def set_picture_filename(instance,filename):
 class Profile(models.Model):
 	class Meta:
 		ordering = ['last','first','middle']
-	MALE = 'M'
-	FEMALE = 'F'
-	GENDERS = (
-		(MALE, 'Male'),
-		(FEMALE, 'Female'),
-	)
 	user = models.OneToOneField(User)
 	state = models.ForeignKey(ProfileStatus)
 	title = models.CharField(max_length=128,verbose_name='Position',blank=True,null=True)
@@ -97,7 +91,7 @@ class Profile(models.Model):
 	middle = models.CharField(max_length=16,verbose_name='Middle Name',blank=True,null=True)
 	last = models.CharField(max_length=16,verbose_name='Last Name')
 	email = models.EmailField(unique=True,verbose_name='Email Address')
-	gender = models.CharField(max_length=1,choices=GENDERS)
+	gender = models.CharField(max_length=30, verbose_name='Gender')
 	sid = models.CharField(unique=True,max_length=9,verbose_name='Student ID')
 	birth = models.DateField(verbose_name='Date of Birth')
 	race = models.CharField(max_length=32,blank=True,null=True)
@@ -125,8 +119,6 @@ class Profile(models.Model):
 			return ' '.join([self.first,self.middle,self.last])
 		else:
 			return ' '.join([self.first,self.last])
-	def gender_string(self):
-		return choice_string(Profile.GENDERS,self.gender)
 	def quarter_string(self):
 		return choice_string(QUARTERS,self.quarter)
 	def filename(self):

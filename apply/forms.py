@@ -47,7 +47,7 @@ class ProfileSearchForm(forms.Form):
 	status = forms.ModelMultipleChoiceField(queryset=ProfileStatus.objects.all())
 	name = forms.CharField(required=False,help_text='Name',widget=forms.TextInput(attrs={'placeholder':'Name'}))
 	email = forms.CharField(required=False,help_text='Email Address',widget=forms.TextInput(attrs={'placeholder':'Email'}))
-	gender = forms.MultipleChoiceField(choices=Profile.GENDERS,initial=[c[0] for c in Profile.GENDERS])
+	gender = forms.CharField(required=False,help_text='Gender',widget=forms.TextInput(attrs={'placeholder':'Male/Female/etc'}))
 	num_mob = forms.CharField(required=False,help_text='Mobile Number',widget=forms.TextInput(attrs={'placeholder':'Mobile Phone'}))
 	num_prm = forms.CharField(required=False,help_text='Permanent Number',widget=forms.TextInput(attrs={'placeholder':'Permanent Phone'}))
 	addr_loc = forms.CharField(required=False,help_text='Local Adddress',widget=forms.TextInput(attrs={'placeholder':'Local Address'}))

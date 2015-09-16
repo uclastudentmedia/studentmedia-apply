@@ -19,7 +19,7 @@ DATABASES = {
 # The name of your domains as strings in a list.
 # Example: ALLOWED_HOSTS = ['dailybruin.com']
 # Needed if DEBUG is False
-ALLOWED_HOSTS = ['.dailybruin.com']
+ALLOWED_HOSTS = ['.dailybruin.com', '.uclastudentmedia.com']
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

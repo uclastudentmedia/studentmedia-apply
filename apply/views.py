@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.context_processors import csrf
 from django.core.mail import send_mail, EmailMessage
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Count, Max, Q
 from django.http import HttpResponseRedirect, Http404, HttpResponse
@@ -901,6 +901,8 @@ def manageEntries(request):
     # TODO: at the url /manage/entries the 'Entries' count currently includes applications submitted by
     # applicants without a profile but the list below does not show the applications.
     #  Should note that somewhere or give option to view those applications
+    # TODO: does a search query using GET querystring which creates server errors if user hand types
+    #  in url.  Should create safety-checking/escaping/exception-catching
 	context = baseContext(request,'managepeople')
 	search_form = EntrySearchForm(request.GET)
 	p = 1
@@ -977,7 +979,14 @@ def manageEntries(request):
 	context['page_count'] = pages.num_pages
 	context['page_range'] = range(max(p-3,1),min(p+4,pages.num_pages+1))
 	context['search_form'] = search_form
-	context['entries'] = pages.page(p)
+	try:
+		context['entries'] = pages.page(p)
+	except PageNotAnInteger:
+		context['entries'] = pages.page(1)
+	except EmptyPage:
+		# If page is out of range (e.g. 9999), deliver last page of results.
+		context['entries'] = pages.page(pages.num_pages)
+
 	context['search_form'] = search_form
 	context['poss'] = poss
 	context['apps'] = apps

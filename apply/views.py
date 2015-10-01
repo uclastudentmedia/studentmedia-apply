@@ -373,7 +373,15 @@ def apply(request,pub,pos,app):
 				application_data = application.decode()
 				type = AttachmentType.objects.get(pk=int(application_data[sq[0]]['questions'][sq[1]]['type']))
 				attachment = Attachment(user=entry.applicant,type=type,file=request.FILES[key])
-				attachment.save()
+
+
+				#print("\n\n>>>>>   ", request.FILES[key].name)
+				# TODO: FIX THIS QUICKFIX
+				try:
+					attachment.save()
+				except:
+				    return HttpResponse('Something went wrong with your attachment:<br /><br />%s\n<br /><br />Please push the back button in your web browser and simplify the filename by removing special characters and/or shortening it.' % request.FILES[key])
+
 				entry_data[key] = [u''.join([u'a',unicode(attachment.id)])]
 		entry.encode(entry_data)
 		entry.save()

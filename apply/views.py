@@ -379,8 +379,10 @@ def apply(request,pub,pos,app):
 				# TODO: FIX THIS QUICKFIX
 				try:
 					attachment.save()
-				except:
-				    return HttpResponse('Something went wrong with your attachment:<br /><br />%s\n<br /><br />Please push the back button in your web browser and simplify the filename by removing special characters and/or shortening it.' % request.FILES[key])
+				except Exception, e:
+					import logging
+                                        logging.exception(e)
+					return HttpResponse('Something went wrong with your attachment:<br /><br />%s\n<br /><br />Please push the back button in your web browser and reupload your attachment with a simplified filename by removing special characters and/or shortening it.  If the problem persists please email your application to <a href="mailto:online@media.ucla.edu">online@media.ucla.edu</a> describing this problem.' % request.FILES[key])
 
 				entry_data[key] = [u''.join([u'a',unicode(attachment.id)])]
 		entry.encode(entry_data)

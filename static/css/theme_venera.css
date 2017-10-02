@@ -7799,7 +7799,7 @@ form.bs-docs-example {
   border-bottom: 1px dashed #b9bdad;
 }
 .jumbotron .container {
-  background: transparent url('docs-help-icon.png') right top no-repeat;
+  background: transparent url('../images/docs-help-icon.png') right top no-repeat;
   background-size: 200px;
   padding-bottom: 20px;
 }

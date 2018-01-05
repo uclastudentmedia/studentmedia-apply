@@ -12,6 +12,7 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail, EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 from django.db.models import Count, Max, Q
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -815,12 +816,15 @@ def managePosition(request):
 			if form.is_valid():
 				if not new:
 					old_title = position.title
-				position = form.save()
+				position = form.save(commit=False)
 				if not new:
 					position.title = old_title
 				else:
 					position.slug = slugify(position.title)
-				position.save()
+				try:
+					position.save()
+				except IntegrityError:
+					pass # TODO: actually fix
 				LogEntry.objects.log_action(
 					user_id=request.user.id,
 					content_type_id=ContentType.objects.get_for_model(Position).pk,

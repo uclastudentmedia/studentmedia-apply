@@ -92,6 +92,7 @@ def baseContext(request,name):
 		'navbar':links,
 		'publications':Publication.objects.all(),
 		'staff':request.user.is_authenticated() and request.user.is_staff,
+                'superuser':request.user.is_authenticated() and request.user.is_superuser,
 	})
 	activeLink(context,name)
 	context.update(csrf(request))

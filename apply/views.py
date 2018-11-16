@@ -12,6 +12,7 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail, EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 from django.db.models import Count, Max, Q
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -92,6 +93,7 @@ def baseContext(request,name):
 		'navbar':links,
 		'publications':Publication.objects.all(),
 		'staff':request.user.is_authenticated() and request.user.is_staff,
+		'superuser':request.user.is_authenticated() and request.user.is_superuser,
 	})
 	activeLink(context,name)
 	context.update(csrf(request))
@@ -379,10 +381,17 @@ def apply(request,pub,pos,app):
 				# TODO: FIX THIS QUICKFIX
 				try:
 					attachment.save()
-				except Exception, e:
+				except IOError as e:
+					try:
+						email = EmailMessage('Apply site IOError: views.py shitty quickfix', str(e), None, ['mis@media.ucla.edu'])
+						email.send()
+					except:
+						pass
+				except Exception as e:
 					import logging
-                                        logging.exception(e)
-					return HttpResponse('Something went wrong with your attachment:<br /><br />%s\n<br /><br />Please push the back button in your web browser and reupload your attachment with a simplified filename by removing special characters and/or shortening it.  If the problem persists please email your application to <a href="mailto:online@media.ucla.edu">online@media.ucla.edu</a> describing this problem.' % request.FILES[key])
+					logging.exception(e)
+
+					return HttpResponse('Something went wrong with your attachment:<br /><br />%s\n<br /><br />Please push the back button in your web browser and reupload your attachment with a simplified filename by removing special characters and/or shortening it.  If the problem persists please email your application to <a href="mailto:mis@media.ucla.edu">mis@media.ucla.edu</a> describing this problem.' % request.FILES[key])
 
 				entry_data[key] = [u''.join([u'a',unicode(attachment.id)])]
 		entry.encode(entry_data)
@@ -815,12 +824,18 @@ def managePosition(request):
 			if form.is_valid():
 				if not new:
 					old_title = position.title
-				position = form.save()
+				position = form.save(commit=False)
 				if not new:
 					position.title = old_title
 				else:
 					position.slug = slugify(position.title)
-				position.save()
+				try:
+					position.save()
+				except IntegrityError:
+					# https://github.com/daily-bruin/studentmedia-apply/issues/4
+					# If a new position's name is not unique when slugified, this fails
+					# TODO: actually fix
+					pass
 				LogEntry.objects.log_action(
 					user_id=request.user.id,
 					content_type_id=ContentType.objects.get_for_model(Position).pk,

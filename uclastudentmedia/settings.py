@@ -9,7 +9,8 @@ TEMPLATE_DEBUG = config.DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
-	('Jeph Park', 'jpark1@media.ucla.edu'),
+	('A N', 'anguyen@media.ucla.edu'),
+	('mis', 'mis@media.ucla.edu'),
 )
 
 MANAGERS = ADMINS

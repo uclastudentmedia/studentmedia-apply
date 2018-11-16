@@ -9,7 +9,7 @@ Requirements
 * [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)
 * [PostgreSQL](http://www.postgresql.org/download/)
 
-Open postgres shell with `psql` command. In sql shell, create a database for the site and user
+Open postgres shell with `psql` command. On Mac, the command for this is `psql postgres`. In sql shell, create a database for the site and user
 
 	CREATE DATABASE django;
 	CREATE ROLE django SUPERUSER LOGIN PASSWORD 'django';

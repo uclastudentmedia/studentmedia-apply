@@ -29,7 +29,11 @@ from django.core.exceptions import MultipleObjectsReturned
 try:
 	APPLICANT = ProfileStatus.objects.get(name__icontains='applicant')
 except ProfileStatus.DoesNotExist:
-	APPLICANT = ProfileStatus.objects.create(name='ApplMultipleObjectsReturnedicant')
+  try:
+	  APPLICANT = ProfileStatus.objects.create(name='ApplMultipleObjectsReturnedicant')
+  except IntegrityError:
+    APPLICANT = ProfileStatus.objects.get(name='ApplMultipleObjectsReturnedicant')
+    print("ApplMultipleObjectsReturnedicant already exists")
 except MultipleObjectsReturned:
 	APPLICANT = ProfileStatus.objects.all()[0]
 	print("ERROR: original developer intended for only one Profile Status to contain the word 'Applicant'")

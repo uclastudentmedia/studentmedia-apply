@@ -14,10 +14,10 @@
 <form method="POST" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
  <input type="hidden" name="id" value="{{publication.id}}">
 {%endif%}
-<!-- <ul class="breadcrumb">
- <li><a href="{%url 'applications'%}">Media</a></li>
+<ul class="breadcrumb">
+ <li><a href="{%url 'applications'%}">All Publications</a></li>
  <li class="active">
-  {%if staff%}
+  <!-- {%if staff%}
   <span class="btn-group">
    <button title="{%if publication.active%}deactivate{%else%}activate{%endif%}" type="button" class="btn" onclick="editPub('toggle')"><i class="icon-eye-{%if publication.active%}close{%else%}open{%endif%}"></i></button>
    <button title="edit publication" type="button" id="buttonedit" class="btn" onclick="showEdit(true)"><i class="icon-edit"></i></button>
@@ -28,10 +28,10 @@
    <button title="save changes" type="submit" style="display:none;" id="editsave" class="btn"><i class="icon-save"></i></button>
   </span>
   <input type="hidden" name="title" value="{{publication}}">
-  {%endif%}
+  {%endif%} -->
   <span{%if not publication.active%} class="text-error"{%endif%}>{{publication}}</span>
  </li>
-</ul> -->
+</ul>
 {%endblock%}
 {%block content%}
 <h1 class="section-header">{{publication}} Applications</h1>

@@ -1,7 +1,7 @@
 <div class="span6">
  <legend>{{list_title}}</legend>
  {%for application in applications%}
- <div class="pub-box">
+ <div class="white-box">
   <label>
    <a href="{%url 'apply' pub=application.position.publication.slug pos=application.position.slug app=application.slug%}">{{application.quarter_string}} {{application.year}}</a>&nbsp;
    {%if application.is_open%}

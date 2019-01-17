@@ -11,11 +11,11 @@
  <input type="hidden" name="publication" value="{{position.publication.id}}">
  <input type="hidden" name="id" value="{{position.id}}">
 {%endif%}
-<!-- <ul class="breadcrumb">
+<ul class="breadcrumb">
  <li><a href="{%url 'applications'%}">Media</a></li>
  <li><a href="{%url 'publication' position.publication.slug%}">{{position.publication}}</a></li>
  <li class="active">
-  {%if staff%}
+  <!-- {%if staff%}
   <span class="btn-group">
    <button title="{%if position.active%}deactivate{%else%}activate{%endif%}" type="button" class="btn" onclick="editPos('toggle')"><i class="icon-eye-{%if position.active%}close{%else%}open{%endif%}"></i></button>
    <button title="edit position" type="button" id="buttonedit" class="btn" onclick="showEdit(true)"><i class="icon-edit"></i></button>
@@ -24,7 +24,7 @@
    <button title="delete position" type="button" class="btn" onclick="editPos('delete')"><i class="icon-trash"></i></button>
    {%endif%}
   </span>
-  {%endif%}
+  {%endif%} -->
   {%if position.active%}{{position.title}}
   {%else%}<span class="text-error" title="This position is inactive.">{{position.title}}</span>
   {%endif%}
@@ -32,7 +32,7 @@
   <input type="hidden" name="title" value="{{position.title}}">
     {%endif%}
  </li>
-</ul> -->
+</ul>
 {%endblock%}
 {%block content%}
 <h1 class="section-header">{{position}}</h1>

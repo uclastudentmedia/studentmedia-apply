@@ -14,7 +14,7 @@
 <form method="POST" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
  <input type="hidden" name="id" value="{{publication.id}}">
 {%endif%}
-<ul class="breadcrumb">
+<!-- <ul class="breadcrumb">
  <li><a href="{%url 'applications'%}">Media</a></li>
  <li class="active">
   {%if staff%}
@@ -31,13 +31,14 @@
   {%endif%}
   <span{%if not publication.active%} class="text-error"{%endif%}>{{publication}}</span>
  </li>
-</ul>
+</ul> -->
 {%endblock%}
 {%block content%}
-
+<h1 class="section-header">{{publication}} Applications</h1>
+<h2 class="section-paragraph">Publication Description</h2>
 <p {%if staff%}id="postdesc" {%endif%}style="white-space:pre-wrap;">{%autoescape off%}{{publication.description}}{%endautoescape%}</p>
 {%if staff%}
-<textarea placeholder="This is a description of the media or program." id="editdesc" style="display:none;" class="input-block-level" rows="5" name="description">{%autoescape off%}{{publication.description}}{%endautoescape%}</textarea>
+<textarea placeholder="This is a description of the media or program." id="editdesc" style="display:none; resize:none" class="input-block-level" rows="5" name="description">{%autoescape off%}{{publication.description}}{%endautoescape%}</textarea>
 </form>
 
 {%endif%}
@@ -50,14 +51,14 @@
 {%include 'blank.html'%}
 {%endif%}
 {%if staff%}
-<form method='POST'>{%csrf_token%}
+<!-- <form method='POST'>{%csrf_token%}
  {%for list in poss%}
  {%for pos in list%}
  <input type="hidden" id="order{{pos.id}}" name="{{pos.id}}" value="{{pos.rank}}">
  {%endfor%}
  {%endfor%}
  <button type="submit" class="btn">Save ordering</button>
-</form>
+</form> -->
 <span id="posttitlenew" class="hidden"></span>
 <span id="postdescnew" class="hidden"></span>
 <div class="row">
@@ -71,7 +72,7 @@
    <button title="save new position" id="editsavenew" class="btn" type="submit" style="display:none;"><i class="icon-save"></i></button>
    <div id="editdescnew" style="display:none;">
     <span class="help-block">You will not be able to edit the title once this position is created.</span>
-    <textarea placeholder="This is a description of the position." class="input-block-level" rows="5" name="description"></textarea>
+    <textarea placeholder="This is a description of the position." class="input-block-level" rows="5" name="description" style="resize:none"></textarea>
    </div>
   </form>
  </div>

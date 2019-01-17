@@ -286,9 +286,9 @@ def publications(request):
 	for i, publication in enumerate(publications):
 		pubs[i%3]+=[publication]
 	context['exists'] = publications.exists()
-	context['pubs'] = pubs
+	context['pubs'] = pubs;
 	return render(request,'publications.html',context)
-
+  
 def publication(request,slug):
 	context = baseContext(request,'applications')
 	publication = get_object_or_404(Publication,slug=slug)

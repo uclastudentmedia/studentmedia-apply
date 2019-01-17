@@ -1,11 +1,11 @@
 {%extends 'base.html'%}
 
-{%block breadcrumbs%}
-<ul class="breadcrumb">
- <li class="active">Media</li>
-</ul>
-{%endblock%}
 {%block content%}
+<h1 class="section-header">All Available Applications</h1>
+<p>Student Media is the proud publisher of the publications listed below.<br>
+Check out open positions by selecting the publication you are interested in below.<br>
+To submit an application, first create a profile with your contact information.<br>
+<em>Please note that we only recruit during the Fall and Winter Quarters.</em></p>
 {%if exists%}
 <div class="row">
  {%include 'publist.html' with publications=pubs.0%}
@@ -16,14 +16,14 @@
 {%include 'blank.html'%}
 {%endif%}
 {%if staff%}
-<form method='POST'>{%csrf_token%}
+<!-- <form method='POST'>{%csrf_token%}
  {%for list in pubs%}
  {%for pub in list%}
  <input type="hidden" id="order{{pub.id}}" name="{{pub.id}}" value="{{pub.rank}}">
  {%endfor%}
  {%endfor%}
  <button type="submit" class="btn">Save ordering</button>
-</form>
+</form> -->
 <div class="row">
  <div class="span6 offset3">
   <button title="add new publication" onclick="showEdit('new',true)" class="btn btn-block" id="buttoneditnew"><i class="icon-plus"></i> Add New Publication</button>
@@ -32,7 +32,7 @@
    <form method="POST" action="{%url 'managepublication'%}?next={{request.get_full_path|urlencode}}">{%csrf_token%}
     <legend><input class="input" placeholder="Title" name="title"><button class="btn" type="submit"><i class="icon-save"></i></button></legend>
     <span class="help-block">You will not be able to edit the title once this publication is created.</span>
-    <textarea placeholder="This is a description of the media or program." class="input-block-level" rows="5" name="description"></textarea>
+    <textarea placeholder="This is a description of the media or program." class="input-block-level" rows="5" name="description" style="resize:none"></textarea>
     <input type="hidden" name="id" value="new">
     <input type="checkbox" class="hidden" name="active">
    </form>

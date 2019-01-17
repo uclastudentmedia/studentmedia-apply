@@ -11,7 +11,7 @@
  <input type="hidden" name="publication" value="{{position.publication.id}}">
  <input type="hidden" name="id" value="{{position.id}}">
 {%endif%}
-<ul class="breadcrumb">
+<!-- <ul class="breadcrumb">
  <li><a href="{%url 'applications'%}">Media</a></li>
  <li><a href="{%url 'publication' position.publication.slug%}">{{position.publication}}</a></li>
  <li class="active">
@@ -32,9 +32,11 @@
   <input type="hidden" name="title" value="{{position.title}}">
     {%endif%}
  </li>
-</ul>
+</ul> -->
 {%endblock%}
 {%block content%}
+<h1 class="section-header">{{position}}</h1>
+<h2 class="section-paragraph">Position Overview</h2>
 <p {%if staff%}id="postdesc" {%endif%}style="white-space:pre-wrap;">{%autoescape off%}{{position.description}}{%endautoescape%}</p>
 {%if staff%}
 <textarea placeholder="This is a description of the position." class="input-block-level" id="editdesc" name="description" style="display:none;" rows="8">{%autoescape off%}{{position.description}}{%endautoescape%}</textarea>
@@ -54,8 +56,8 @@
 {%endif%}
 {%if applications%}
 <div class="row-fluid">
- {%include 'applist.html' with list_title='Current Applications' applications=apps.0%}
- {%include 'applist.html' with list_title='Past Applications' applications=apps.1%}
+ {%include 'applist.html' with list_title='Open Applications' applications=apps.0%}
+ {%include 'applist.html' with list_title='Closed Applications' applications=apps.1%}
 </div>
 {%else%}
 {%include 'blank.html'%}

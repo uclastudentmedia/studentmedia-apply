@@ -8,7 +8,7 @@
   <title>UCLA Student Media</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
-  <link href="{%static 'css/theme_venera_white.css'%}" media="all" rel="stylesheet" type="text/css"/>
+  <link href="{%static 'css/theme_venera_blue.css'%}" media="all" rel="stylesheet" type="text/css"/>
   <link href="{%static 'css/style.css'%}" media="all" rel="stylesheet" type="text/css"/>
   <link href="https://fonts.googleapis.com/css?family=Abel:400|Oswald:300,400,700" media="all" rel="stylesheet" type="text/css" />
   {% block extra_style %}{% endblock %}
@@ -23,37 +23,16 @@
        <span class='icon-bar'></span>
        <span class='icon-bar'></span>
       </a>
-      <a href="{%url 'home'%}" class="brand">Apply: UCLA Student Media</a>
+      <a href="{%url 'home'%}" class="brand">UCLA Student Media</a>
       <div class='nav-collapse subnav-collapse collapse pull-right' id='top-navigation'>
        <ul class='nav'>
+
         <li{%ifequal 'home' active%} class='active'{%endifequal%}><a href="{%url 'home'%}">Home</a></li>
-        <li class="dropdown{%ifequal 'applications' active%} active{%endifequal%}">
-         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Applications</a>
-         <ul class="dropdown-menu">
-          <li><a href="{%url 'applications'%}">Browse Media</a></li>
-          <li class="divider"></li>
-          {%for publication in publications%}
-          {%if publication.active or user.is_authenticated and user.is_staff%}
-          <li class="dropdown-submenu">
-           <a tabindex="-1" href="{%url 'publication' publication.slug%}">{{publication}}</a>
-           <ul class="dropdown-menu">
-            {%if user.is_authenticated and user.is_staff or not publication.no_app%}
-            {%for position in publication.position_set.all%}
-            {%if position.active or user.is_authenticated and user.is_staff%}
-            <li><a href="{%url 'position' pub=publication.slug pos=position.slug%}">{{position.title}}</a>
-            {%endif%}
-            {%empty%}
-            <li><span class="muted">&nbsp;&nbsp;No applications listed</span></li>
-            {%endfor%}
-            {%else%}
-            <li><span class="muted">&nbsp;&nbsp;No applications listed</span></li>
-            {%endif%}
-           </ul>
-          </li>
-          {%endif%}
-          {%endfor%}
-         </ul>
+        
+        <li {%ifequal 'applications' active%} class="active"{%endifequal%}>
+          <a href="{%url 'applications' %}"">Applications</a>
         </li>
+
         {%if user.is_authenticated and user.is_staff%}
         <li class="dropdown{%ifequal 'managepeople' active%} active{%endifequal%}">
          <a class="dropdown-toggle" data-toggle="dropdown" href="#">People</a>
@@ -63,11 +42,13 @@
          </ul>
         </li>
         {%endif%}
+
         {%if user.is_authenticated%}
         <li{%ifequal 'profile' active%} class="active"{%endifequal%}>
          <a href="{%url 'profile'%}">Profile</a>
         </li>
         {%endif%}
+        
         <li class="dropdown{%ifequal 'account' active%} active{%endifequal%}">
          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account</a>
          <ul class="dropdown-menu">

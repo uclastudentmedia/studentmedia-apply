@@ -5,3 +5,9 @@ white-space:pre-wrap;
 .hide {
 display:none;
 }
+
+.white-box {
+	background: #fff;
+	padding: 15px;
+	border-radius: 10px;
+}

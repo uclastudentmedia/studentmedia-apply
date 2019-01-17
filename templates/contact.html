@@ -1,9 +1,11 @@
 {%extends 'base.html'%}
 
 {%block content%}
-<h1 class="section-header">Contact</h1>
+<h1 class="section-header">Contact Us</h1>
+<p>Please let us know if you have any questions or concerns and we will get back to you as soon as possible!</p>
+
 <div class="row">
- <div class="span4">
+ <!-- <div class="span4">
   <div class="blog-side-text-block widget-filled widget-yellow">
    <legend>Contact Information</legend>
    <ul class="unstyled big-iconed-tips">
@@ -15,19 +17,19 @@
     {%endfor%}
    </ul>
   </div>
- </div>
- <div class="span8">
+ </div> -->
+ <div class="span12">
   <form class="" method="POST">{%csrf_token%}
    <div class="row-fluid">
-    <div class="span6">
+    <!-- <div class="span6"> -->
      <div class="control-group{%if contact_form.sender.errors%} error{%endif%}">
-      <label class="control-label">Sender</label>
+      <label class="control-label">Your Email</label>
       <div class="controls">
        {{contact_form.sender}}
       </div>
      </div>
-    </div>
-    <div class="span6">
+    <!-- </div> -->
+    <!-- <div class="span6">
      <div class="control-group{%if contact_form.recipient.errors%} error{%endif%}">
       <label class="control-label">Recipient</label>
       <div class="controls">
@@ -36,7 +38,7 @@
       </div>
      </div>
     </div>
-   </div>
+   </div> -->
    <div class="control-group{%if contact_form.subject.errors%} error{%endif%}">
     <label class="control-label">Subject</label>
     <div class="controls">

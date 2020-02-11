@@ -3,7 +3,7 @@
 #  Important: django, south, psycopg, gunicorn, requests, django-mailer
 
 
-Django==1.6.11
+Django==1.11.28
 django-mailer==1.1
 Pillow==2.9.0
 PyYAML==3.10

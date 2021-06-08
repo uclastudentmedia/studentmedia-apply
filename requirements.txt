@@ -5,7 +5,7 @@
 
 Django==1.6.11
 django-mailer==1.1
-Pillow==2.9.0
+Pillow==8.2.0
 PyYAML==3.10
 South==1.0.2
 argparse==1.2.1
